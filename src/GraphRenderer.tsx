@@ -60,8 +60,8 @@ const GraphRenderer = (props: Props) => {
         const degrees = graph.nodes().map((node) => graph.degree(node));
         const minDegree = Math.min(...degrees);
         const maxDegree = Math.max(...degrees);
-        const minSize = 2;
-        const maxSize = 150;
+        const minSize = 10;
+        const maxSize = 100;
         
         graph.forEachNode((node) => {
             const degree = graph.degree(node);
@@ -109,8 +109,8 @@ const GraphRenderer = (props: Props) => {
 
         // Desenha o grafo final usando Sigma
         const container = document.getElementById("container") as HTMLElement;
-        container.style.height = "1000px";
-        container.style.width = "1000px";
+        container.style.height = "800px";
+        container.style.width = "100%";
 
         sigmaRef.current = new Sigma(graph, container, {
             defaultNodeType: "bordered",
