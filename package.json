@@ -23,7 +23,7 @@
     "react": "^18.3.0",
     "react-dom": "^18.3.0",
     "react-papaparse": "^4.4.0",
-    "react-scripts": "5.0.1",
+    "react-scripts": "^5.0.1",
     "sigma": "^3.0.0-beta.17",
     "typescript": "^4.9.5",
     "web-vitals": "^2.1.4"
