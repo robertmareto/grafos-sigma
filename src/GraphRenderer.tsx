@@ -172,7 +172,7 @@ const GraphRenderer = (props: Props) => {
         
         // Função para lidar com a mudança de seleção de cluster
         function handleClusterChange(event: Event) {
-            const target = event.target as HTMLInputElement;
+            //const target = event.target as HTMLInputElement; // NÃO SEI
             setClusters(getSelectedClusters());
         }
         

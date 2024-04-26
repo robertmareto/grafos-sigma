@@ -34,9 +34,5 @@ interface JSONData {
     edges: Edge[];
 }
 
-interface Props {
-    jsonData: JSONData;
-};
-
 // Exportando os tipos para uso em outros arquivos
 export type { NodeAttributes, EdgeAttributes, Node, Edge, JSONData};
