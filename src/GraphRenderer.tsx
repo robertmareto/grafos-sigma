@@ -158,37 +158,70 @@ const GraphRenderer = (props: Props) => {
         container.style.height = "800px";
         container.style.width = "100%";
 
-        // Localixa o Seletor Input no HTML
         const clusterInputParent = document.getElementById("clusterInput");
 
-        // Se houver seletor, criar o elemento select
-        if (clusterInputParent && !clusterInputParent.querySelector("#clusterSelect")) {
-            const clusterSelect = document.createElement("select");
-            clusterSelect.id = "clusterSelect";
-
-            // Adicionar a opção "Exibir Todos"
-            const showAllOption = document.createElement("option");
-            showAllOption.value = "";
-            showAllOption.textContent = "Exibir Todos";
-            clusterSelect.appendChild(showAllOption);
-
-            // Adiciona as opções ao seletor a partir do numero de clusters do Louvain
+        // Verificar se o seletor já existe antes de criar novamente
+        if (clusterInputParent && !clusterInputParent.querySelector("#clusterCheckboxes")) {
+            // Cria um grupo de checkboxes
+            const clusterCheckboxesGroup = document.createElement("div");
+            clusterCheckboxesGroup.id = "clusterCheckboxes";
+            
+            // Adiciona a opção "Exibir Todos" como checkbox
+            const showAllCheckbox = document.createElement("input");
+            showAllCheckbox.type = "checkbox";
+            showAllCheckbox.name = "clusterOption";
+            showAllCheckbox.value = "";
+            showAllCheckbox.id = "showAllCheckbox";
+            showAllCheckbox.addEventListener("change", () => toggleShowAllNodes(showAllCheckbox.checked)); // Define a função de clique para exibir todos
+            const showAllLabel = document.createElement("label");
+            showAllLabel.htmlFor = "showAllCheckbox";
+            showAllLabel.textContent = "Exibir Todos";
+            clusterCheckboxesGroup.appendChild(showAllCheckbox);
+            clusterCheckboxesGroup.appendChild(showAllLabel);
+            
+            // Adiciona as checkboxes para cada cluster
             for (let i = 0; i < details.count; i++) {
-                const option = document.createElement("option");
-                option.value = i.toString();
-                option.textContent = `Cluster ${i + 1}`;
-                clusterSelect.appendChild(option);
+                const clusterCheckbox = document.createElement("input");
+                clusterCheckbox.type = "checkbox";
+                clusterCheckbox.name = "clusterOption";
+                clusterCheckbox.value = i.toString();
+                clusterCheckbox.id = `clusterCheckbox${i}`;
+                clusterCheckbox.addEventListener("change", handleClusterChange); // Define a função de clique para selecionar o cluster
+                const clusterLabel = document.createElement("label");
+                clusterLabel.htmlFor = `clusterCheckbox${i}`;
+                clusterLabel.textContent = `Cluster ${i + 1}`;
+                clusterCheckboxesGroup.appendChild(clusterCheckbox);
+                clusterCheckboxesGroup.appendChild(clusterLabel);
             }
-
-            // Ao trocar o seletor, exibe apenas o Cluster selecionado
-            clusterSelect.addEventListener("change", (event) => {
-                const selectedCluster = (event.target as HTMLSelectElement).value;
-                setCluster(selectedCluster);
-            });
-
-            clusterInputParent.appendChild(clusterSelect);
+            
+            clusterInputParent.appendChild(clusterCheckboxesGroup);
         }
-
+        
+        // Função para lidar com a mudança de seleção de cluster
+        function handleClusterChange(event: Event) {
+            const target = event.target as HTMLInputElement;
+            setClusters(getSelectedClusters());
+        }
+        
+        // Função para obter os clusters selecionados
+        function getSelectedClusters(): string[] {
+            const selectedClusters: string[] = [];
+            const checkboxes = document.querySelectorAll<HTMLInputElement>("input[name=clusterOption]:checked");
+            checkboxes.forEach((checkbox) => {
+                selectedClusters.push(checkbox.value);
+            });
+            return selectedClusters;
+        }
+        
+        // Função para lidar com a seleção de "Exibir Todos"
+        function toggleShowAllNodes(showAll: boolean) {
+            if (showAll) {
+                setClusters([]);
+            } else {
+                setClusters(getSelectedClusters());
+            }
+        }
+        
         sigmaRef.current = new Sigma(graph, container, {
             defaultNodeType: "bordered",
             //labelSize: 16,
@@ -396,30 +429,29 @@ const GraphRenderer = (props: Props) => {
             return res;
         });
     
-        function setCluster(query: string) {
-            if (query) {
-                // Mostra somente os nós da comunidade selecionada
+        const setClusters = (selectedClusters: string[]) => {
+            if (selectedClusters.length === 0) {
+                // Se nenhum cluster estiver selecionado, exibir todos os nós
                 graph.forEachNode((node) => {
-                    const community = graph.getNodeAttribute(node, "community") as number;
-                    //console.log(community)
-                    if (community.toString() === query) {
+                    graph.setNodeAttribute(node, "hidden", false);
+                });
+            } else {
+                // Exibir apenas os nós dos clusters selecionados
+                graph.forEachNode((node) => {
+                    const community = graph.getNodeAttribute(node, "community").toString();
+                    if (selectedClusters.includes(community)) {
                         graph.setNodeAttribute(node, "hidden", false);
                     } else {
                         graph.setNodeAttribute(node, "hidden", true);
                     }
                 });
-            } else {
-                // Mostra todos os nós quando nenhum cluster está selecionado
-                graph.forEachNode((node) => {
-                    graph.setNodeAttribute(node, "hidden", false);
-                });
             }
-        
+            
             // Atualiza o gráfico Sigma para refletir as alterações
             sigmaRef.current?.refresh({
                 skipIndexation: true,
             });
-        }
+        };
        
         // Remover o renderizador Sigma anterior, se houver, quando este efeito for executado novamente
         return () => {
@@ -431,20 +463,21 @@ const GraphRenderer = (props: Props) => {
     }, [props.jsonData]);
 
     return (
-        
         <div>
             <div id="loader">Loading ...</div>
             <div id="clusterInput"></div>
             <div id="search">
                 <input type="search" id="search-input" list="suggestions" placeholder="Search Node"></input>
-                <datalist id="suggestions"><option value="Myriel"></option>
+                <datalist id="suggestions">
+                    <option value="Myriel"></option>
                     <option value="cop30"></option>
                     <option value="brasil"></option>
                     <option value="nodelabel3"></option>
                     <option value="nodelabel4"></option>
-                    <option value="nodelabel5"></option></datalist>
-                </div>
-                <div id="container"></div>
+                    <option value="nodelabel5"></option>
+                </datalist>
+            </div>
+            <div id="container"></div>
         </div>
     );
 };
