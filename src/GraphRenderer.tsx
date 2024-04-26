@@ -162,7 +162,7 @@ const GraphRenderer = (props: Props) => {
         const clusterInputParent = document.getElementById("clusterInput");
 
         // Se houver seletor, criar o elemento select
-        if (clusterInputParent) {
+        if (clusterInputParent && !clusterInputParent.querySelector("#clusterSelect")) {
             const clusterSelect = document.createElement("select");
             clusterSelect.id = "clusterSelect";
 
@@ -395,7 +395,7 @@ const GraphRenderer = (props: Props) => {
                 // Mostra somente os nós da comunidade selecionada
                 graph.forEachNode((node) => {
                     const community = graph.getNodeAttribute(node, "community") as number;
-                    console.log(community)
+                    //console.log(community)
                     if (community.toString() === query) {
                         graph.setNodeAttribute(node, "hidden", false);
                     } else {
