@@ -166,6 +166,12 @@ const GraphRenderer = (props: Props) => {
             const clusterSelect = document.createElement("select");
             clusterSelect.id = "clusterSelect";
 
+            // Adicionar a opção "Exibir Todos"
+            const showAllOption = document.createElement("option");
+            showAllOption.value = "";
+            showAllOption.textContent = "Exibir Todos";
+            clusterSelect.appendChild(showAllOption);
+
             // Adiciona as opções ao seletor a partir do numero de clusters do Louvain
             for (let i = 0; i < details.count; i++) {
                 const option = document.createElement("option");
