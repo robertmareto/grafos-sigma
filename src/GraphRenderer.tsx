@@ -1,3 +1,4 @@
+import { JSONData } from './Types'
 import { useEffect, useRef } from 'react';
 import Graph from "graphology";
 import Sigma from "sigma";
@@ -25,34 +26,7 @@ import noverlap from 'graphology-layout-noverlap';
     - Configurar para aceitar weight no lugar de size nas edges do dataGraph.json
 */
 
-interface NodeAttributes {
-    x: number;
-    y: number;
-    size: number;
-    label: string;
-    color: string;
-}
 
-interface EdgeAttributes {
-    size: number;
-}
-
-interface Node {
-    key: string;
-    attributes: NodeAttributes;
-}
-
-interface Edge {
-    key: string;
-    source: string;
-    target: string;
-    attributes: EdgeAttributes;
-}
-
-interface JSONData {
-    nodes: Node[];
-    edges: Edge[];
-}
 
 interface Props {
     jsonData: JSONData;
