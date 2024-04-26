@@ -209,7 +209,6 @@ const GraphRenderer = (props: Props) => {
 
         //console.log(sigmaRef.current)
 
-
         // Tipo e declaração de estado interno:
         interface State {
             hoveredNode?: string;
@@ -391,9 +390,6 @@ const GraphRenderer = (props: Props) => {
             return res;
         });
     
-
-        const clusterInput = document.getElementById("clusterInput") as HTMLInputElement;
-
         function setCluster(query: string) {
             if (query) {
                 // Mostra somente os nós da comunidade selecionada
