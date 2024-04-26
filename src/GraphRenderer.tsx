@@ -20,7 +20,6 @@ import noverlap from 'graphology-layout-noverlap';
 //import {subgraph} from 'graphology-operators';  // Para trabalhar com sub graphos => https://graphology.github.io/standard-library/operators.html#subgraph
 
 /* TO DO: 
-    - Menu Ocultar Clusters {node atributte "community: 5"}
     - Sub Clusters
     - Label Proporcional ao Node (nota: parece que o sigma usa uma mesma fonte para todo o Canva e não por nó)
     - Configurar para aceitar weight no lugar de size nas edges do dataGraph.json
@@ -155,7 +154,7 @@ const GraphRenderer = (props: Props) => {
 
         // Desenha o grafo final usando Sigma
         const container = document.getElementById("container") as HTMLElement;
-        container.style.height = "800px";
+        container.style.height = "500px";
         container.style.width = "100%";
 
         const clusterInputParent = document.getElementById("clusterInput");
