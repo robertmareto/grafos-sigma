@@ -23,6 +23,7 @@ import noverlap from 'graphology-layout-noverlap';
     - Menu Ocultar Clusters {node atributte "community: 5"}
     - Sub Clusters
     - Label Proporcional ao Node (nota: parece que o sigma usa uma mesma fonte para todo o Canva e não por nó)
+    - Configurar para aceitar weight no lugar de size nas edges do dataGraph.json
 */
 
 interface NodeAttributes {

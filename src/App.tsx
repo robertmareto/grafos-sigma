@@ -1,6 +1,6 @@
 import React from 'react';
 import GraphRenderer from './GraphRenderer';
-import json_data from './data.json';
+import json_data from './dataGraph.json';
 
 const App = () => {
   return (
