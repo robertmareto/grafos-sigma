@@ -158,12 +158,15 @@ const GraphRenderer = (props: Props) => {
         container.style.height = "800px";
         container.style.width = "100%";
 
+        // Localixa o Seletor Input no HTML
         const clusterInputParent = document.getElementById("clusterInput");
 
+        // Se houver seletor, criar o elemento select
         if (clusterInputParent) {
             const clusterSelect = document.createElement("select");
             clusterSelect.id = "clusterSelect";
 
+            // Adiciona as opções ao seletor a partir do numero de clusters do Louvain
             for (let i = 0; i < details.count; i++) {
                 const option = document.createElement("option");
                 option.value = i.toString();
@@ -171,6 +174,7 @@ const GraphRenderer = (props: Props) => {
                 clusterSelect.appendChild(option);
             }
 
+            // Ao trocar o seletor, exibe apenas o Cluster selecionado
             clusterSelect.addEventListener("change", (event) => {
                 const selectedCluster = (event.target as HTMLSelectElement).value;
                 setCluster(selectedCluster);
@@ -414,19 +418,7 @@ const GraphRenderer = (props: Props) => {
                 skipIndexation: true,
             });
         }
-
-        /*setCluster("")
-        
-        // Adiciona ouvintes de eventos para atualizar os clusters ao digitar ou sair do campo de entrada
-        clusterInput.addEventListener("input", () => {
-            setCluster(clusterInput.value);
-        });
-        
-        clusterInput.addEventListener("blur", () => {
-            setCluster("");
-        }); */
-        
-
+       
         // Remover o renderizador Sigma anterior, se houver, quando este efeito for executado novamente
         return () => {
             if (sigmaRef.current) {
