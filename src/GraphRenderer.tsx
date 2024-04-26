@@ -147,7 +147,7 @@ const GraphRenderer = (props: Props) => {
               }
         });
 
-        console.log(graph)
+        //console.log(graph)
 
         // Esconde o loader da DOM
         const loader = document.getElementById("loader") as HTMLElement;
@@ -157,6 +157,27 @@ const GraphRenderer = (props: Props) => {
         const container = document.getElementById("container") as HTMLElement;
         container.style.height = "800px";
         container.style.width = "100%";
+
+        const clusterInputParent = document.getElementById("clusterInput");
+
+        if (clusterInputParent) {
+            const clusterSelect = document.createElement("select");
+            clusterSelect.id = "clusterSelect";
+
+            for (let i = 0; i < details.count; i++) {
+                const option = document.createElement("option");
+                option.value = i.toString();
+                option.textContent = `Cluster ${i + 1}`;
+                clusterSelect.appendChild(option);
+            }
+
+            clusterSelect.addEventListener("change", (event) => {
+                const selectedCluster = (event.target as HTMLSelectElement).value;
+                setCluster(selectedCluster);
+            });
+
+            clusterInputParent.appendChild(clusterSelect);
+        }
 
         sigmaRef.current = new Sigma(graph, container, {
             defaultNodeType: "bordered",
@@ -365,7 +386,46 @@ const GraphRenderer = (props: Props) => {
 
             return res;
         });
+    
 
+        const clusterInput = document.getElementById("clusterInput") as HTMLInputElement;
+
+        function setCluster(query: string) {
+            if (query) {
+                // Mostra somente os nós da comunidade selecionada
+                graph.forEachNode((node) => {
+                    const community = graph.getNodeAttribute(node, "community") as number;
+                    console.log(community)
+                    if (community.toString() === query) {
+                        graph.setNodeAttribute(node, "hidden", false);
+                    } else {
+                        graph.setNodeAttribute(node, "hidden", true);
+                    }
+                });
+            } else {
+                // Mostra todos os nós quando nenhum cluster está selecionado
+                graph.forEachNode((node) => {
+                    graph.setNodeAttribute(node, "hidden", false);
+                });
+            }
+        
+            // Atualiza o gráfico Sigma para refletir as alterações
+            sigmaRef.current?.refresh({
+                skipIndexation: true,
+            });
+        }
+
+        /*setCluster("")
+        
+        // Adiciona ouvintes de eventos para atualizar os clusters ao digitar ou sair do campo de entrada
+        clusterInput.addEventListener("input", () => {
+            setCluster(clusterInput.value);
+        });
+        
+        clusterInput.addEventListener("blur", () => {
+            setCluster("");
+        }); */
+        
 
         // Remover o renderizador Sigma anterior, se houver, quando este efeito for executado novamente
         return () => {
@@ -380,8 +440,9 @@ const GraphRenderer = (props: Props) => {
         
         <div>
             <div id="loader">Loading ...</div>
+            <div id="clusterInput"></div>
             <div id="search">
-                <input type="search" id="search-input" list="suggestions" placeholder="Seach Node"></input>
+                <input type="search" id="search-input" list="suggestions" placeholder="Search Node"></input>
                 <datalist id="suggestions"><option value="Myriel"></option>
                     <option value="cop30"></option>
                     <option value="brasil"></option>
