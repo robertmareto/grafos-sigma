@@ -5,7 +5,7 @@ import { Coordinates, EdgeDisplayData, NodeDisplayData } from "sigma/types";
 import { cropToLargestConnectedComponent } from "graphology-components";
 import forceAtlas2 from "graphology-layout-forceatlas2";
 import circular from "graphology-layout/circular";
-import { NodeBorderProgram } from "@sigma/node-border"
+//import { NodeBorderProgram } from "@sigma/node-border"
 import { createNodeBorderProgram } from "@sigma/node-border";
 import circlepack from "graphology-layout/circlepack";
 import louvain from "graphology-communities-louvain";
@@ -18,6 +18,12 @@ import noverlap from 'graphology-layout-noverlap';
 
 
 //import {subgraph} from 'graphology-operators';  // Para trabalhar com sub graphos => https://graphology.github.io/standard-library/operators.html#subgraph
+
+/* TO DO: 
+    - Menu Ocultar Clusters {node atributte "community: 5"}
+    - Sub Clusters
+    - Label Proporcional ao Node (nota: parece que o sigma usa uma mesma fonte para todo o Canva e não por nó)
+*/
 
 interface NodeAttributes {
     x: number;
@@ -77,14 +83,22 @@ const GraphRenderer = (props: Props) => {
         
         graph.forEachNode((node) => {
             const degree = graph.degree(node);
-
+        
             // Define o tamanho do nó proporcional ao grau
             graph.setNodeAttribute(
                 node,
                 "size",
                 minSize + ((degree - minDegree) / (maxDegree - minDegree)) * (maxSize - minSize),
             );
+        
+            // Define o tamanho da label proporcional ao tamanho do nó
+            graph.setNodeAttribute(
+                node,
+                "labelSize",
+                14 + ((graph.getNodeAttribute(node, "size") - minSize) / (maxSize - minSize)) * (24 - 14), // Ajuste os valores de 14 e 24 conforme necessário
+            );
         });
+        
 
         // Posiciona os nós em um círculo e aplica o algoritmo Force Atlas 2 para obter um layout adequado
         circular.assign(graph);
@@ -132,6 +146,8 @@ const GraphRenderer = (props: Props) => {
               }
         });
 
+        console.log(graph)
+
         // Esconde o loader da DOM
         const loader = document.getElementById("loader") as HTMLElement;
         if (loader) loader.style.display = "none";
@@ -143,13 +159,13 @@ const GraphRenderer = (props: Props) => {
 
         sigmaRef.current = new Sigma(graph, container, {
             defaultNodeType: "bordered",
-            labelSize: 14,
+            //labelSize: 16,
             labelDensity: 5.87,
             labelGridCellSize: 10,
             labelRenderedSizeThreshold: 10,
             zIndex: true,
             defaultEdgeType: "curve",
-            labelFont: "Lato, sans-serif",
+            //labelFont: "Lato, sans-serif",
             itemSizesReference: "positions",
             //zoomToSizeRatioFunction: undefined,
             edgeProgramClasses: {
@@ -164,6 +180,8 @@ const GraphRenderer = (props: Props) => {
                 }),
               },
             });
+
+        //console.log(sigmaRef.current)
 
 
         // Tipo e declaração de estado interno:
