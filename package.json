@@ -3,6 +3,7 @@
   "version": "0.1.0",
   "private": true,
   "dependencies": {
+    "@react-sigma/core": "^4.0.2",
     "@sigma/edge-curve": "^3.0.0-beta.6",
     "@sigma/node-border": "^3.0.0-beta.3",
     "@testing-library/jest-dom": "^5.17.0",
@@ -19,11 +20,14 @@
     "graphology-layout": "^0.6.1",
     "graphology-layout-force": "^0.2.4",
     "graphology-layout-forceatlas2": "^0.10.1",
+    "graphology-layout-noverlap": "^0.4.2",
+    "graphology-operators": "^1.6.0",
     "papaparse": "^5.4.1",
     "react": "^18.3.0",
     "react-dom": "^18.3.0",
     "react-papaparse": "^4.4.0",
     "react-scripts": "^5.0.1",
+    "react-sigma": "^1.2.35",
     "sigma": "^3.0.0-beta.17",
     "typescript": "^4.9.5",
     "web-vitals": "^2.1.4"

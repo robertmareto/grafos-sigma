@@ -10,6 +10,14 @@ import { createNodeBorderProgram } from "@sigma/node-border";
 import circlepack from "graphology-layout/circlepack";
 import louvain from "graphology-communities-louvain";
 import EdgeCurveProgram from "@sigma/edge-curve";
+import noverlap from 'graphology-layout-noverlap';
+
+
+//import { SigmaContainer, ControlsContainer, ZoomControl, FullScreenControl, SearchControl } from "@react-sigma/core";
+//import "@react-sigma/core/lib/react-sigma.min.css";
+
+
+//import {subgraph} from 'graphology-operators';  // Para trabalhar com sub graphos => https://graphology.github.io/standard-library/operators.html#subgraph
 
 interface NodeAttributes {
     x: number;
@@ -48,7 +56,11 @@ const GraphRenderer = (props: Props) => {
     const sigmaRef = useRef<Sigma | null>(null);
 
     useEffect(() => {
-        const graph = new Graph(); // Cria um Novo Grapho
+        const graph = new Graph({
+            multi: true,
+            allowSelfLoops: true,
+            type: 'directed'
+        }); // Cria um Novo Grapho
 
         const data = props.jsonData; // Usando os dados JSON passados como propriedade
 
@@ -80,8 +92,13 @@ const GraphRenderer = (props: Props) => {
         forceAtlas2.assign(graph, { settings, iterations: 600 });
 
         // Identifica comunidades no grafo usando o algoritmo de Louvain
-        louvain.assign(graph, {resolution: 1});
+        louvain.assign(graph, {
+            resolution: 1
+        });
+
         let details = louvain.detailed(graph);
+
+        //console.log(details.count)
 
         // Define cores aleatórias para cada comunidade
         const colors: Record<number, number> = {};
@@ -100,7 +117,19 @@ const GraphRenderer = (props: Props) => {
 
         // Agrupa visualmente os nós de acordo com suas comunidades
         circlepack.assign(graph, {
+            center: 2,
             hierarchyAttributes: ["community"],
+            scale: 2 // Aumenta a escala do grafico distanciando os clusters
+        });
+
+        // Aplica o layout noverlap com opções de configuração
+        noverlap.assign(graph, {
+            maxIterations: 500,
+            settings: {
+                margin: 6, // Distancia os nós
+                ratio: 1.5,
+                expansion: 1.5 // Quanto os nós podem expandir
+              }
         });
 
         // Esconde o loader da DOM
@@ -114,8 +143,15 @@ const GraphRenderer = (props: Props) => {
 
         sigmaRef.current = new Sigma(graph, container, {
             defaultNodeType: "bordered",
-            labelSize: 10,
+            labelSize: 14,
+            labelDensity: 5.87,
+            labelGridCellSize: 10,
+            labelRenderedSizeThreshold: 10,
+            zIndex: true,
             defaultEdgeType: "curve",
+            labelFont: "Lato, sans-serif",
+            itemSizesReference: "positions",
+            //zoomToSizeRatioFunction: undefined,
             edgeProgramClasses: {
                 curve: EdgeCurveProgram,
               },
@@ -129,7 +165,6 @@ const GraphRenderer = (props: Props) => {
               },
             });
 
-        // Integração da função do Sigma
 
         // Tipo e declaração de estado interno:
         interface State {
@@ -202,6 +237,64 @@ const GraphRenderer = (props: Props) => {
                 skipIndexation: true,
             });
         }
+
+        const renderer = sigmaRef.current
+
+        // State for drag'n'drop
+        let draggedNode: string | null = null;
+        let isDragging = false;
+
+        // Ações ao clicar no Nó
+        renderer.on("downNode", (e) => {
+            isDragging = true; // Define o estado de arrasto
+            draggedNode = e.node;
+            graph.setNodeAttribute(draggedNode, "highlighted", true);
+        });
+
+        // Ações ao passar o mouse sobre o Nó
+        renderer.on("enterNode", (e) => {
+            draggedNode = e.node; // Define o nó especifico
+            setHoveredNode(draggedNode) // oculta os nós sem relação
+            graph.setNodeAttribute(draggedNode, "highlighted", true); // dá destauqe ao nó
+        });
+
+        // Ações ao sair o mouse do Nó
+        renderer.on("leaveNode", (e) => {
+            draggedNode = e.node;
+            setHoveredNode(undefined)
+            graph.setNodeAttribute(draggedNode, "highlighted", false);
+        });
+
+        // Eventos com o mouse em movimento arrastando o nó
+        renderer.getMouseCaptor().on("mousemovebody", (e) => {
+            if (!isDragging || !draggedNode) return;
+
+            // Get new position of node
+            const pos = renderer.viewportToGraph(e);
+
+            graph.setNodeAttribute(draggedNode, "x", pos.x);
+            graph.setNodeAttribute(draggedNode, "y", pos.y);
+
+            // Prevent sigma to move camera:
+            e.preventSigmaDefault();
+            e.original.preventDefault();
+            e.original.stopPropagation();
+        });
+
+        // On mouse up, we reset the autoscale and the dragging mode
+        renderer.getMouseCaptor().on("mouseup", () => {
+            if (draggedNode) {
+            graph.removeNodeAttribute(draggedNode, "highlighted");
+            }
+            isDragging = false;
+            draggedNode = null;
+        });
+
+        // Ações ao largar o nó
+        renderer.getMouseCaptor().on("mousedown", () => {
+            //setHoveredNode(undefined)
+            if (!renderer.getCustomBBox()) renderer.setCustomBBox(renderer.getBBox());
+        });  
         
         // Liga interações de entrada no nó de pesquisa:
         const searchInput = document.getElementById("search-input") as HTMLInputElement;
@@ -213,23 +306,15 @@ const GraphRenderer = (props: Props) => {
             setSearchQuery("");
         });
         
-        /*/ Liga interações do gráfico:
-        sigmaRef.current?.bind("enterNode", ({ node }) => {
-            setHoveredNode(node);
-        });
-        sigmaRef.current?.bind("leaveNode", () => {
-            setHoveredNode(undefined);
-        }); */
-        
         // Renderiza os nós de acordo com o estado interno:
         sigmaRef.current?.setSetting("nodeReducer", (node, data) => {
             const res: Partial<NodeDisplayData> = { ...data };
-        
+
             if (state.hoveredNeighbors && !state.hoveredNeighbors.has(node) && state.hoveredNode !== node) {
                 res.label = "";
                 res.color = "#f6f6f6";
             }
-        
+
             if (state.selectedNode === node) {
                 res.highlighted = true;
             } else if (state.suggestions) {
@@ -240,27 +325,28 @@ const GraphRenderer = (props: Props) => {
                     res.color = "#f6f6f6";
                 }
             }
-        
+
             return res;
         });
-        
-        // Renderiza as arestas de acordo com o estado interno:
+
+        // Define o EdgeReducer para controlar a renderização das arestas
         sigmaRef.current?.setSetting("edgeReducer", (edge, data) => {
             const res: Partial<EdgeDisplayData> = { ...data };
-        
+
             if (state.hoveredNode && !graph.hasExtremity(edge, state.hoveredNode)) {
                 res.hidden = true;
             }
-        
+
             if (
                 state.suggestions &&
                 (!state.suggestions.has(graph.source(edge)) || !state.suggestions.has(graph.target(edge)))
             ) {
                 res.hidden = true;
             }
-        
+
             return res;
         });
+
 
         // Remover o renderizador Sigma anterior, se houver, quando este efeito for executado novamente
         return () => {
@@ -272,6 +358,7 @@ const GraphRenderer = (props: Props) => {
     }, [props.jsonData]);
 
     return (
+        
         <div>
             <div id="loader">Loading ...</div>
             <div id="search">
