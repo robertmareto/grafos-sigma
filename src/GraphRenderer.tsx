@@ -36,11 +36,12 @@ const GraphRenderer = (props: Props) => {
     const sigmaRef = useRef<Sigma | null>(null);
 
     useEffect(() => {
+        // Cria um Novo Grapho
         const graph = new Graph({
-            multi: true,
-            allowSelfLoops: true,
-            type: 'directed'
-        }); // Cria um Novo Grapho
+            multi: true, // Permite multi arestas
+            allowSelfLoops: true, // Permite arestas para o proprio nó
+            type: 'directed' // Tipo da Aresta
+        });
 
         const data = props.jsonData; // Usando os dados JSON passados como propriedade
 
@@ -65,13 +66,13 @@ const GraphRenderer = (props: Props) => {
                 minSize + ((degree - minDegree) / (maxDegree - minDegree)) * (maxSize - minSize),
             );
         
-            // Define o tamanho da label proporcional ao tamanho do nó
+            /* NÃO FUNCIONA // Define o tamanho da label proporcional ao tamanho do nó
             graph.setNodeAttribute(
                 node,
                 "labelSize",
                 14 + ((graph.getNodeAttribute(node, "size") - minSize) / (maxSize - minSize)) * (24 - 14), // Ajuste os valores de 14 e 24 conforme necessário
-            );
-        });
+            );*/
+        });  
         
 
         // Posiciona os nós em um círculo e aplica o algoritmo Force Atlas 2 para obter um layout adequado
@@ -81,9 +82,10 @@ const GraphRenderer = (props: Props) => {
 
         // Identifica comunidades no grafo usando o algoritmo de Louvain
         louvain.assign(graph, {
-            resolution: 1
+            resolution: 1 // Resolução - Quanto maior mais comunidades
         });
 
+        // Obtém os detalhes do que o Louvain fez
         let details = louvain.detailed(graph);
 
         //console.log(details.count)
@@ -128,9 +130,10 @@ const GraphRenderer = (props: Props) => {
 
         // Desenha o grafo final usando Sigma
         const container = document.getElementById("container") as HTMLElement;
-        container.style.height = "500px";
-        container.style.width = "100%";
+        container.style.height = "500px"; // Altura do Container
+        container.style.width = "100%"; // Largura do Container
 
+        // Seletor de Cluster-Comunidades
         const clusterInputParent = document.getElementById("clusterInput");
 
         // Verificar se o seletor já existe antes de criar novamente
@@ -196,14 +199,14 @@ const GraphRenderer = (props: Props) => {
         }
         
         sigmaRef.current = new Sigma(graph, container, {
-            defaultNodeType: "bordered",
-            //labelSize: 16,
-            labelDensity: 5.87,
-            labelGridCellSize: 10,
-            labelRenderedSizeThreshold: 10,
+            defaultNodeType: "bordered", // Tipo de node
+            labelSize: 12, // Tamanho da label
+            labelDensity: 10, // Densidade de Labels
+            labelGridCellSize: 5, // Grade de Labels
+            labelRenderedSizeThreshold: 9, // Label x Zoom
             zIndex: true,
-            defaultEdgeType: "curve",
-            //labelFont: "Lato, sans-serif",
+            defaultEdgeType: "curve", // Tipo da Aresta (curvada)
+            //labelFont: "Lato, sans-serif", // Fonte da Label
             itemSizesReference: "positions",
             //zoomToSizeRatioFunction: undefined,
             edgeProgramClasses: {
@@ -212,8 +215,8 @@ const GraphRenderer = (props: Props) => {
             nodeProgramClasses: {
                 bordered: createNodeBorderProgram({
                   borders: [
-                    { size: { attribute: "borderSize", defaultValue: 0.0001 }, color: { attribute: "borderColor" } },
-                    { size: { fill: true }, color: { attribute: "color" } },
+                    { size: { attribute: "borderSize", defaultValue: 0.0001 }, color: { attribute: "borderColor" } }, // Espessura e cor da borda do Nó
+                    { size: { fill: true }, color: { attribute: "color" } }, // Cor do Nó
                   ],
                 }),
               },
@@ -354,6 +357,7 @@ const GraphRenderer = (props: Props) => {
         // Liga interações de entrada no nó de pesquisa:
         const searchInput = document.getElementById("search-input") as HTMLInputElement;
 
+        // Monitora o input da pesquista
         searchInput.addEventListener("input", () => {
             setSearchQuery(searchInput.value || "");
         });
