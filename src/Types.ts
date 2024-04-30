@@ -7,6 +7,8 @@ interface NodeAttributes {
     size: number;
     label: string;
     color: string;
+    modularity_class: number;
+    //community: string;
 }
 
 // Definindo os tipos de dados para as arestas
