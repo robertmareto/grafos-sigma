@@ -1,7 +1,7 @@
 import Sigma from 'sigma';
 import { State } from '../Types'
 import Graph from 'graphology';
-import { EdgeDisplayData } from 'sigma/types';
+import { EdgeDisplayData, NodeDisplayData } from 'sigma/types';
 
 type Coordinates = {
     x: number;
@@ -109,6 +109,30 @@ export function setEdgeReducer(sigma: Sigma, graph: Graph, state: State) {
             (!state.suggestions.has(graph.source(edge)) || !state.suggestions.has(graph.target(edge)))
         ) {
             res.hidden = true;
+        }
+
+        return res;
+    });
+}
+
+export function setNodeReducer(sigma: Sigma, graph: Graph, state: State) {
+    sigma.setSetting("nodeReducer", (node, data) => {
+        const res: Partial<NodeDisplayData> = { ...data };
+
+        if (state.hoveredNeighbors && !state.hoveredNeighbors.has(node) && state.hoveredNode !== node) {
+            res.label = "";
+            res.color = "#f6f6f6";
+        }
+
+        if (state.selectedNode === node) {
+            res.highlighted = true;
+        } else if (state.suggestions) {
+            if (state.suggestions.has(node)) {
+                res.forceLabel = true;
+            } else {
+                res.label = "";
+                res.color = "#f6f6f6";
+            }
         }
 
         return res;
