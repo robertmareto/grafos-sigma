@@ -4,7 +4,7 @@ import Sigma from "sigma";
 import { Coordinates, EdgeDisplayData, NodeDisplayData } from "sigma/types";
 import { createGraph, CommunityDetails, modularityDetails } from './Graphology';
 import { renderSigma } from './Sigma';
-import { handleClusterChange, getSelectedClusters, toggleShowAllNodes, setSearchQuery, setHoveredNode, setEdgeReducer } from './SigmaUtils';
+import { handleClusterChange, getSelectedClusters, toggleShowAllNodes, setSearchQuery, setHoveredNode, setEdgeReducer, setNodeReducer } from './SigmaUtils';
 
 import { BiBookContent, BiRadioCircleMarked } from "react-icons/bi";
 import { SigmaContainer, ControlsContainer, ZoomControl, FullScreenControl, SearchControl,  } from "@react-sigma/core";
@@ -195,28 +195,7 @@ const GraphRenderer = (props: Props) => {
         });
 
         // Renderiza os nós de acordo com o estado interno:
-        sigmaRef.current?.setSetting("nodeReducer", (node, data) => {
-            const res: Partial<NodeDisplayData> = { ...data };
-
-            if (state.hoveredNeighbors && !state.hoveredNeighbors.has(node) && state.hoveredNode !== node) {
-                res.label = "";
-                res.color = "#f6f6f6";
-            }
-
-            if (state.selectedNode === node) {
-                res.highlighted = true;
-            } else if (state.suggestions) {
-                if (state.suggestions.has(node)) {
-                    res.forceLabel = true;
-                } else {
-                    res.label = "";
-                    res.color = "#f6f6f6";
-                }
-            }
-
-            return res;
-        });
-        
+        setNodeReducer(sigmaRef.current, graph, state);
 
         // Define o EdgeReducer para controlar a renderização das arestas
         setEdgeReducer(sigmaRef.current, graph, state);
