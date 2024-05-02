@@ -36,5 +36,17 @@ interface JSONData {
     edges: Edge[];
 }
 
+interface State {
+    hoveredNode?: string;
+    searchQuery: string;
+
+    // State derivado da query:
+    selectedNode?: string;
+    suggestions?: Set<string>;
+
+    // State derivado do nó hovered:
+    hoveredNeighbors?: Set<string>;
+}
+
 // Exportando os tipos para uso em outros arquivos
-export type { NodeAttributes, EdgeAttributes, Node, Edge, JSONData};
+export type { NodeAttributes, EdgeAttributes, Node, Edge, JSONData, State};
