@@ -1,14 +1,14 @@
 import React, { useState, useEffect, useRef, useCallback } from 'react';
-import { JSONData, State } from '../Types'
+import { JSONData, State, CommunityDetails, modularityDetails, GephiJSONData,   } from '../Types'
 import Sigma from "sigma";
-import { Coordinates, EdgeDisplayData, NodeDisplayData } from "sigma/types";
-import { createGraph, CommunityDetails, modularityDetails } from './Graphology';
+import { createGephiGraph, createNewGraph } from './Graphology';
 import { renderSigma } from './Sigma';
 import { handleClusterChange, getSelectedClusters, toggleShowAllNodes, setSearchQuery, setHoveredNode, setEdgeReducer, setNodeReducer } from './SigmaUtils';
+import { graphFunction } from './JsonValidator'
 
-import { BiBookContent, BiRadioCircleMarked } from "react-icons/bi";
-import { SigmaContainer, ControlsContainer, ZoomControl, FullScreenControl, SearchControl,  } from "@react-sigma/core";
-import { BsArrowsFullscreen, BsFullscreenExit, BsZoomIn, BsZoomOut } from 'react-icons/bs';
+// import { BiBookContent, BiRadioCircleMarked } from "react-icons/bi";
+// import { SigmaContainer, ControlsContainer, ZoomControl, FullScreenControl, SearchControl,  } from "@react-sigma/core";
+// import { BsArrowsFullscreen, BsFullscreenExit, BsZoomIn, BsZoomOut } from 'react-icons/bs';
 //import "@react-sigma/core/lib/react-sigma.min.css";
 
 
@@ -17,14 +17,15 @@ import { BsArrowsFullscreen, BsFullscreenExit, BsZoomIn, BsZoomOut } from 'react
 /* TO DO:
     - Graphology gerar um arquivo .json e sigma apenas importar
     - Sub Clusters
-    - Label Proporcional ao Node (nota: parece que o sigma usa uma mesma fonte para todo o Canva e não por nó)
     - Configurar para aceitar weight no lugar de size nas edges do dataGraph.json
 */
+let JsonDataType : JSONData
 
+type JsonDataType = typeof createGephiGraph extends typeof graphFunction ? GephiJSONData : JSONData;
 
 interface Props {
-    jsonData: JSONData;
-};
+    jsonData: JsonDataType;
+}
 
 const GraphRenderer = (props: Props) => {
     const sigmaRef = useRef<Sigma | null>(null);
@@ -32,14 +33,14 @@ const GraphRenderer = (props: Props) => {
 
     // Função para renderizar o gráfico Sigma
     const renderGraph = useCallback(() => {
-        const [graph, details, modularityDetails ] = createGraph(props.jsonData);
+        const [graph, details, modularityDetails ] = graphFunction(props.jsonData);
         
         // Localiza o container
         const container = document.getElementById("container") as HTMLElement;
         
         // Define tamanho do container
-        container.style.height = "600px";
-        container.style.width = "100%";
+        container.style.height = "85vh";
+        container.style.width = "100vw";
         
         // Renderiza o grapho com o Sigma
         sigmaRef.current = renderSigma(graph, container);
@@ -61,6 +62,8 @@ const GraphRenderer = (props: Props) => {
         const searchQueryHandler = setSearchQuery(state, graph, sigmaRef);
         const hoveredNodeHandler = setHoveredNode(state, graph, sigmaRef);
 
+        let hieraquia = graphFunction(props.jsonData) ? "modularity_class" : "comunnity";
+
         const setClusters = (selectedClusters: string[]) => {
             if (selectedClusters.length === 0) {
                 // Se nenhum cluster estiver selecionado, exibir todos os nós
@@ -71,7 +74,7 @@ const GraphRenderer = (props: Props) => {
             } else {
                 // Exibir apenas os nós dos clusters selecionados
                 graph.forEachNode((node) => {
-                    const community = graph.getNodeAttribute(node, "modularity_class").toString();
+                    const community = graph.getNodeAttribute(node, hieraquia).toString();
                     if (selectedClusters.includes(community)) {
                         graph.setNodeAttribute(node, "hidden", false);
                     } else {

@@ -1,7 +1,7 @@
 // Types.ts
 
 // Definindo os tipos de dados para os nós
-interface NodeAttributes {
+interface GephiNodeAttributes {
     x: number;
     y: number;
     size: number;
@@ -11,15 +11,33 @@ interface NodeAttributes {
     //community: string;
 }
 
+// Definindo os tipos de dados para os nós
+interface NewNodeAttributes {
+    x: number;
+    y: number;
+    size: number;
+    label: string;
+    color: string;
+    //community: string;
+}
+
 // Definindo os tipos de dados para as arestas
 interface EdgeAttributes {
     size: number;
 }
+interface GephiEdgeAttributes {
+    weight: number;
+}
 
 // Definindo a interface para um nó
-interface Node {
+interface NewNode {
     key: string;
-    attributes: NodeAttributes;
+    attributes: NewNodeAttributes;
+}
+
+interface GephiNode {
+    key: string;
+    attributes: GephiNodeAttributes;
 }
 
 // Definindo a interface para uma aresta
@@ -30,11 +48,32 @@ interface Edge {
     attributes: EdgeAttributes;
 }
 
-// Definindo o formato do JSON de dados
+interface GephiEdge {
+    key: string;
+    source: string;
+    target: string;
+    attributes: GephiEdgeAttributes;
+}
+
+
 interface JSONData {
-    nodes: Node[];
+    nodes: NewNode[];
     edges: Edge[];
 }
+
+interface GephiJSONData {
+    attributes: {
+        creator: string
+      }
+    options: {
+        multi: Boolean;
+        allowSelfLoops: Boolean;
+        type: String;
+      };
+    nodes: GephiNode[];
+    edges: GephiEdge[];
+}
+
 
 interface State {
     hoveredNode?: string;
@@ -48,5 +87,15 @@ interface State {
     hoveredNeighbors?: Set<string>;
 }
 
+interface CommunityDetails {
+    count: number;
+    communities: Record<string, number>;
+}
+
+interface modularityDetails {
+    count: number;
+    classes: Record<string, number>;
+}
+
 // Exportando os tipos para uso em outros arquivos
-export type { NodeAttributes, EdgeAttributes, Node, Edge, JSONData, State};
+export type { NewNodeAttributes, GephiNodeAttributes, EdgeAttributes, NewNode, GephiNode, Edge, JSONData, GephiJSONData, State, CommunityDetails, modularityDetails};
