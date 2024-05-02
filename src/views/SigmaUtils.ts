@@ -1,20 +1,12 @@
+import Sigma from 'sigma';
+import { State } from '../Types'
+import Graph from 'graphology';
+import { EdgeDisplayData } from 'sigma/types';
+
 type Coordinates = {
     x: number;
     y: number;
 };
-
-interface State {
-    hoveredNode?: string;
-    searchQuery: string;
-
-    // State derivado da query:
-    selectedNode?: string;
-    suggestions?: Set<string>;
-
-    // State derivado do nó hovered:
-    hoveredNeighbors?: Set<string>;
-}
-
 
 export function handleClusterChange(setClusters: (selectedClusters: string[]) => void, getSelectedClusters: () => string[]) {
     return (event: Event) => {
@@ -102,4 +94,23 @@ export function setHoveredNode(state: State, graph: any, sigmaRef: any) {
             skipIndexation: true,
         });
     };
+}
+
+export function setEdgeReducer(sigma: Sigma, graph: Graph, state: State) {
+    sigma.setSetting("edgeReducer", (edge, data) => {
+        const res: Partial<EdgeDisplayData> = { ...data };
+
+        if (state.hoveredNode && !graph.hasExtremity(edge, state.hoveredNode)) {
+            res.hidden = true;
+        }
+
+        if (
+            state.suggestions &&
+            (!state.suggestions.has(graph.source(edge)) || !state.suggestions.has(graph.target(edge)))
+        ) {
+            res.hidden = true;
+        }
+
+        return res;
+    });
 }

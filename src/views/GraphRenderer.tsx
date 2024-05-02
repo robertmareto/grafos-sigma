@@ -1,10 +1,10 @@
 import React, { useState, useEffect, useRef, useCallback } from 'react';
-import { JSONData } from '../Types'
+import { JSONData, State } from '../Types'
 import Sigma from "sigma";
 import { Coordinates, EdgeDisplayData, NodeDisplayData } from "sigma/types";
 import { createGraph, CommunityDetails, modularityDetails } from './Graphology';
 import { renderSigma } from './Sigma';
-import { handleClusterChange, getSelectedClusters, toggleShowAllNodes, setSearchQuery, setHoveredNode } from './SigmaUtils';
+import { handleClusterChange, getSelectedClusters, toggleShowAllNodes, setSearchQuery, setHoveredNode, setEdgeReducer } from './SigmaUtils';
 
 import { BiBookContent, BiRadioCircleMarked } from "react-icons/bi";
 import { SigmaContainer, ControlsContainer, ZoomControl, FullScreenControl, SearchControl,  } from "@react-sigma/core";
@@ -47,18 +47,6 @@ const GraphRenderer = (props: Props) => {
         // Esconde o loader da DOM
         const loader = document.getElementById("loader") as HTMLElement;
         if (loader) loader.style.display = "none";
-
-        interface State {
-            hoveredNode?: string;
-            searchQuery: string;
-        
-            // State derivado da query:
-            selectedNode?: string;
-            suggestions?: Set<string>;
-        
-            // State derivado do nó hovered:
-            hoveredNeighbors?: Set<string>;
-        }
 
         const state: State = { searchQuery: "" };
 
@@ -228,24 +216,10 @@ const GraphRenderer = (props: Props) => {
 
             return res;
         });
+        
 
         // Define o EdgeReducer para controlar a renderização das arestas
-        sigmaRef.current?.setSetting("edgeReducer", (edge, data) => {
-            const res: Partial<EdgeDisplayData> = { ...data };
-
-            if (state.hoveredNode && !graph.hasExtremity(edge, state.hoveredNode)) {
-                res.hidden = true;
-            }
-
-            if (
-                state.suggestions &&
-                (!state.suggestions.has(graph.source(edge)) || !state.suggestions.has(graph.target(edge)))
-            ) {
-                res.hidden = true;
-            }
-
-            return res;
-        });
+        setEdgeReducer(sigmaRef.current, graph, state);
 
         // Atualiza o gráfico Sigma para refletir as alterações
         sigmaRef.current?.refresh({
