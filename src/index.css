@@ -11,3 +11,16 @@ code {
   font-family: source-code-pro, Menlo, Monaco, Consolas, 'Courier New',
     monospace;
 }
+
+.clusterInput {
+  display: flex;
+  justify-content: space-evenly;
+  width: 95vw;
+  align-content: center;
+  flex-wrap: wrap;
+  flex-direction: row;
+  align-items: center;
+  margin: auto;
+  text-align: justify;
+  /* height: 15vh; */
+}
