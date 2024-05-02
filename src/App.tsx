@@ -1,5 +1,5 @@
 import React from 'react';
-import GraphRenderer from './GraphRenderer';
+import GraphRenderer from './views/GraphRenderer';
 import jsonData from './dataGraph.json'
 
 
