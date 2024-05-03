@@ -5,7 +5,7 @@ import circular from "graphology-layout/circular";
 import louvain from "graphology-communities-louvain";
 import circlepack from "graphology-layout/circlepack";
 import noverlap from 'graphology-layout-noverlap';
-import { JSONData, NewNode, CommunityDetails, modularityDetails, GephiNode } from '../Types'
+import { JSONData, Node, CommunityDetails, modularityDetails } from '../Types'
 // import { UndirectedGraph } from 'graphology';
 // import JSONdata from '../dataGraph.json';
 
@@ -212,7 +212,7 @@ export function createNewGraph(data: any): [Graph, CommunityDetails, modularityD
 }
 
 // Conta o numero de Modularidades unicas e retorna uma relação de nós por classe de modularidade
-export function countUniqueModularityClasses(nodes: GephiNode[]): { count: number, classes: Record<string, number> } {
+export function countUniqueModularityClasses(nodes: Node[]): { count: number, classes: Record<string, number> } {
     const modularityClasses: Record<string, number> = {};
     
     nodes.forEach((node) => {

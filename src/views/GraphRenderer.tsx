@@ -1,5 +1,5 @@
 import React, { useState, useEffect, useRef, useCallback } from 'react';
-import { JSONData, State, CommunityDetails, modularityDetails, GephiJSONData,   } from '../Types'
+import { JSONData, State, CommunityDetails, modularityDetails } from '../Types'
 import Sigma from "sigma";
 import { createGephiGraph, createNewGraph } from './Graphology';
 import { renderSigma } from './Sigma';
@@ -15,16 +15,14 @@ import { graphFunction } from './JsonValidator'
 //import {subgraph} from 'graphology-operators';  // Para trabalhar com sub graphos => https://graphology.github.io/standard-library/operators.html#subgraph
 
 /* TO DO:
+    - painel lateral com os pares das arestas e pesos
     - Graphology gerar um arquivo .json e sigma apenas importar
     - Sub Clusters
     - Configurar para aceitar weight no lugar de size nas edges do dataGraph.json
 */
-let JsonDataType : JSONData
-
-type JsonDataType = typeof createGephiGraph extends typeof graphFunction ? GephiJSONData : JSONData;
 
 interface Props {
-    jsonData: JsonDataType;
+    jsonData: JSONData;
 }
 
 const GraphRenderer = (props: Props) => {
@@ -62,7 +60,10 @@ const GraphRenderer = (props: Props) => {
         const searchQueryHandler = setSearchQuery(state, graph, sigmaRef);
         const hoveredNodeHandler = setHoveredNode(state, graph, sigmaRef);
 
-        let hieraquia = graphFunction(props.jsonData) ? "modularity_class" : "comunnity";
+        let hieraquia = graphFunction(props.jsonData) ? "comunnity" : "modularity_class";
+        console.log(hieraquia)
+
+        let clustercounter = graphFunction(props.jsonData) ? details.count : modularityDetails.count;
 
         const setClusters = (selectedClusters: string[]) => {
             if (selectedClusters.length === 0) {
@@ -112,7 +113,7 @@ const GraphRenderer = (props: Props) => {
             clusterCheckboxesGroup.appendChild(showAllLabel);
 
             // Adiciona as checkboxes para cada cluster
-            for (let i = 0; i < modularityDetails.count; i++) {
+            for (let i = 0; i < clustercounter; i++) {
                 const clusterCheckbox = document.createElement("input");
                 clusterCheckbox.type = "checkbox";
                 clusterCheckbox.name = "clusterOption";
@@ -134,13 +135,6 @@ const GraphRenderer = (props: Props) => {
         let draggedNode: string | null = null;
         let isDragging = false;
 
-        // // Ações ao clicar no Nó
-        // renderer.on("downNode", (e) => {
-        //     isDragging = true; // Define o estado de arrasto
-        //     draggedNode = e.node;
-        //     graph.setNodeAttribute(draggedNode, "highlighted", true);
-        // });
-
         // Ações ao passar o mouse sobre o Nó
         renderer.on("enterNode", (e) => {
             draggedNode = e.node; // Define o nó especifico
@@ -155,37 +149,6 @@ const GraphRenderer = (props: Props) => {
             graph.setNodeAttribute(draggedNode, "highlighted", false);
         });
 
-        // // Eventos com o mouse em movimento arrastando o nó
-        // renderer.getMouseCaptor().on("mousemovebody", (e) => {
-        //     if (!isDragging || !draggedNode) return;
-
-        //     // Get new position of node
-        //     const pos = renderer.viewportToGraph(e);
-
-        //     graph.setNodeAttribute(draggedNode, "x", pos.x);
-        //     graph.setNodeAttribute(draggedNode, "y", pos.y);
-
-        //     // Prevent sigma to move camera:
-        //     e.preventSigmaDefault();
-        //     e.original.preventDefault();
-        //     e.original.stopPropagation();
-        // });
-
-        // // On mouse up, we reset the autoscale and the dragging mode
-        // renderer.getMouseCaptor().on("mouseup", () => {
-        //     if (draggedNode) {
-        //     graph.removeNodeAttribute(draggedNode, "highlighted");
-        //     }
-        //     isDragging = false;
-        //     draggedNode = null;
-        // });
-
-        // // Ações ao largar o nó
-        // renderer.getMouseCaptor().on("mousedown", () => {
-        //     //setHoveredNode(undefined)
-        //     if (!renderer.getCustomBBox()) renderer.setCustomBBox(renderer.getBBox());
-        // });  
-        
         // Liga interações de entrada no nó de pesquisa:
         const searchInput = document.getElementById("search-input") as HTMLInputElement;
 
@@ -204,9 +167,7 @@ const GraphRenderer = (props: Props) => {
         setEdgeReducer(sigmaRef.current, graph, state);
 
         // Atualiza o gráfico Sigma para refletir as alterações
-        sigmaRef.current?.refresh({
-            skipIndexation: false,
-        });
+        updatesigma()
     
 }, [communityDetails, props.jsonData]);
 
@@ -230,12 +191,8 @@ const GraphRenderer = (props: Props) => {
             <div id="search">
                 <input type="search" id="search-input" list="suggestions" placeholder="Search Node"></input>
                 <datalist id="suggestions">
-                    <option value="Myriel"></option>
                     <option value="cop30"></option>
                     <option value="brasil"></option>
-                    <option value="robert"></option>
-                    <option value="robert2"></option>
-                    <option value="nrobert2"></option>
                 </datalist>
             </div></div>
             <div id="container"></div>

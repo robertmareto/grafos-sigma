@@ -1,43 +1,25 @@
 // Types.ts
 
 // Definindo os tipos de dados para os nós
-interface GephiNodeAttributes {
+interface NodeAttributes {
     x: number;
     y: number;
     size: number;
     label: string;
     color: string;
-    modularity_class: number;
-    //community: string;
-}
-
-// Definindo os tipos de dados para os nós
-interface NewNodeAttributes {
-    x: number;
-    y: number;
-    size: number;
-    label: string;
-    color: string;
-    //community: string;
+    modularity_class?: number | undefined;
 }
 
 // Definindo os tipos de dados para as arestas
 interface EdgeAttributes {
-    size: number;
-}
-interface GephiEdgeAttributes {
-    weight: number;
+    size?: number;
+    weight?: number;
 }
 
 // Definindo a interface para um nó
-interface NewNode {
+interface Node {
     key: string;
-    attributes: NewNodeAttributes;
-}
-
-interface GephiNode {
-    key: string;
-    attributes: GephiNodeAttributes;
+    attributes: NodeAttributes;
 }
 
 // Definindo a interface para uma aresta
@@ -48,32 +30,22 @@ interface Edge {
     attributes: EdgeAttributes;
 }
 
-interface GephiEdge {
-    key: string;
-    source: string;
-    target: string;
-    attributes: GephiEdgeAttributes;
+interface GephiAttributes {
+    creator?: string
 }
 
+interface GephiOptions {
+    multi?: Boolean;
+    allowSelfLoops?: Boolean;
+    type?: String;
+}
 
 interface JSONData {
-    nodes: NewNode[];
+    attributes?: GephiAttributes;
+    options?: GephiOptions;
+    nodes: Node[];
     edges: Edge[];
 }
-
-interface GephiJSONData {
-    attributes: {
-        creator: string
-      }
-    options: {
-        multi: Boolean;
-        allowSelfLoops: Boolean;
-        type: String;
-      };
-    nodes: GephiNode[];
-    edges: GephiEdge[];
-}
-
 
 interface State {
     hoveredNode?: string;
@@ -98,4 +70,4 @@ interface modularityDetails {
 }
 
 // Exportando os tipos para uso em outros arquivos
-export type { NewNodeAttributes, GephiNodeAttributes, EdgeAttributes, NewNode, GephiNode, Edge, JSONData, GephiJSONData, State, CommunityDetails, modularityDetails};
+export type { NodeAttributes, EdgeAttributes, Node, Edge, JSONData, State, CommunityDetails, modularityDetails};

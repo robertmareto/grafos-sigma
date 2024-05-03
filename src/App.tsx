@@ -1,6 +1,6 @@
 import React from 'react';
 import GraphRenderer from './views/GraphRenderer';
-import jsonData from './data/AtoresGraph1.json'
+import jsonData from './data/data.json';
 
 const App = () => {
     return (
