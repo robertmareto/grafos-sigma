@@ -20,23 +20,23 @@ export function createGephiGraph(data: any): [Graph, CommunityDetails, modularit
 
     //cropToLargestConnectedComponent(graph);
 
-    // Calcula o tamanho dos nós com base nos graus
-    const degrees = graph.nodes().map((node) => graph.degree(node));
-    const minDegree = Math.min(...degrees);
-    const maxDegree = Math.max(...degrees);
-    const minSize = 10;
-    const maxSize = 100;
+    // // Calcula o tamanho dos nós com base nos graus
+    // const degrees = graph.nodes().map((node) => graph.degree(node));
+    // const minDegree = Math.min(...degrees);
+    // const maxDegree = Math.max(...degrees);
+    // const minSize = 10;
+    // const maxSize = 100;
     
-    graph.forEachNode((node) => {
-        const degree = graph.degree(node);
+    // graph.forEachNode((node) => {
+    //     const degree = graph.degree(node);
     
-        // Define o tamanho do nó proporcional ao grau
-        graph.setNodeAttribute(
-            node,
-            "size",
-            minSize + ((degree - minDegree) / (maxDegree - minDegree)) * (maxSize - minSize),
-        );
-    }); 
+    //     // Define o tamanho do nó proporcional ao grau
+    //     graph.setNodeAttribute(
+    //         node,
+    //         "size",
+    //         minSize + ((degree - minDegree) / (maxDegree - minDegree)) * (maxSize - minSize),
+    //     );
+    // }); 
 
 
     //TO DO = CALCULAR MELHOR A EXPESSURA DA EDGE
@@ -54,9 +54,9 @@ export function createGephiGraph(data: any): [Graph, CommunityDetails, modularit
     //const settings = forceAtlas2.inferSettings(graph);
     //forceAtlas2.assign(graph, { settings, iterations: 600 });
 
-    louvain.assign(graph, {
-        resolution: 1
-    });
+    // louvain.assign(graph, {
+    //     resolution: 1
+    // });
 
     //let hierarquia = "community"
 
@@ -102,19 +102,19 @@ export function createGephiGraph(data: any): [Graph, CommunityDetails, modularit
         });
     }
 
-    // Aplica o layout CirclePack
+    /*/ Aplica o layout CirclePack
     circlepack.assign(graph, {
         center: 2,
         hierarchyAttributes: [hierarquia], // Atributo usado para definir os clusters
         scale: 1.2 //Escala de tamanho entre os nós
-    });
+    });*/
 
     // Trabalha o espaçamento entre os nós
     noverlap.assign(graph, {
         settings: {
             margin: 1,
         }
-    });
+    }); 
 
     console.log('Grapho gerado usando Modularidade do tipo:', hierarquia )
     console.log('Numero de Clusters', counter )

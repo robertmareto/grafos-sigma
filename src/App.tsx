@@ -1,11 +1,11 @@
 import React from 'react';
 import GraphRenderer from './views/GraphRenderer';
-import jsonData from './data/data.json';
+import JSONdata from './views/JsonValidator';
 
 const App = () => {
     return (
         <div>
-            <GraphRenderer jsonData={jsonData} />
+            <GraphRenderer jsonData={JSONdata} />
         </div>
     );
 }

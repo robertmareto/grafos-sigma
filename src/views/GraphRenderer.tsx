@@ -4,7 +4,7 @@ import Sigma from "sigma";
 import { createGephiGraph, createNewGraph } from './Graphology';
 import { renderSigma } from './Sigma';
 import { handleClusterChange, getSelectedClusters, toggleShowAllNodes, setSearchQuery, setHoveredNode, setEdgeReducer, setNodeReducer } from './SigmaUtils';
-import { graphFunction } from './JsonValidator'
+import { graphFunction, graphType } from './JsonValidator'
 
 // import { BiBookContent, BiRadioCircleMarked } from "react-icons/bi";
 // import { SigmaContainer, ControlsContainer, ZoomControl, FullScreenControl, SearchControl,  } from "@react-sigma/core";
@@ -60,8 +60,13 @@ const GraphRenderer = (props: Props) => {
         const searchQueryHandler = setSearchQuery(state, graph, sigmaRef);
         const hoveredNodeHandler = setHoveredNode(state, graph, sigmaRef);
 
-        let hieraquia = graphFunction(props.jsonData) ? "comunnity" : "modularity_class";
-        console.log(hieraquia)
+        let hierarquia = "comunnity"
+
+        if (graphType === 'Gephi') {
+            hierarquia = "modularity_class";
+        }
+        
+        console.log(hierarquia)
 
         let clustercounter = graphFunction(props.jsonData) ? details.count : modularityDetails.count;
 
@@ -75,7 +80,7 @@ const GraphRenderer = (props: Props) => {
             } else {
                 // Exibir apenas os nós dos clusters selecionados
                 graph.forEachNode((node) => {
-                    const community = graph.getNodeAttribute(node, hieraquia).toString();
+                    const community = graph.getNodeAttribute(node, hierarquia).toString();
                     if (selectedClusters.includes(community)) {
                         graph.setNodeAttribute(node, "hidden", false);
                     } else {

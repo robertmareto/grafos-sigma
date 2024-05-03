@@ -1,5 +1,5 @@
 import { createGephiGraph, createNewGraph } from './Graphology'; // Importe as funções necessárias
-import JSONdata from '../data/data.json'
+import JSONdata from '../data/AtoresGraph1.json'
 
 function isJSONStructureValid(data: any): boolean {
     // Verifica se o JSON tem a estrutura esperada
@@ -17,3 +17,5 @@ function isJSONStructureValid(data: any): boolean {
 
 // Verifique a estrutura do JSONdata e exporte a função apropriada
 export const graphFunction = isJSONStructureValid(JSONdata) ? createGephiGraph : createNewGraph;
+export const graphType = isJSONStructureValid(JSONdata) ? 'Gephi' : 'Sigma';
+export default JSONdata;
