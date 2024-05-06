@@ -14,13 +14,51 @@ code {
 
 .clusterInput {
   display: flex;
-  justify-content: space-evenly;
-  width: 95vw;
   align-content: center;
-  flex-wrap: wrap;
+  flex-wrap: nowrap;
   flex-direction: row;
   align-items: center;
   margin: auto;
-  text-align: justify;
-  /* height: 15vh; */
+}
+
+#clusterCheckboxes{
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+}
+
+.container {
+  display: flex;
+  justify-content: space-evenly;
+  align-items: end;
+  flex-direction: column;
+  height: 98vh;
+  width: 98vw;
+}
+
+.container-row {
+  display: flex;
+  justify-content: space-evenly;
+  align-items: center;
+  flex-direction: row;
+  max-width: 98vw;
+  max-height: 98vh;
+}
+
+.container-item {
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  flex-direction: column;
+}
+
+.lateral-panel {
+  display: flex;
+  justify-content: space-evenly;
+  align-items: center;
+  flex-direction: column;
+  width: 20vw;
+  padding: 2vw;
+  border: 5px solid rgb(35, 22, 105);
+  height: 80vh;
+  margin-top: 10px;
 }

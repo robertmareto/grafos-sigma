@@ -42,10 +42,6 @@ const GraphRenderer = (props: Props) => {
         // Localiza o container
         const container = document.getElementById("container") as HTMLElement;
         
-        // Define tamanho do container
-        container.style.height = "85vh";
-        container.style.width = "100vw";
-        
         // Renderiza o grapho com o Sigma
         sigmaRef.current = renderSigma(graph, container);
 
@@ -200,20 +196,29 @@ const GraphRenderer = (props: Props) => {
     }, [renderGraph]);
 
     return (
-        <><div>
-            <div id="loader">Loading ...</div>
-            <button id="subGraphButton">Show SubGraph</button>
-            <div id="clusterInput" className='clusterInput'>
-            <div id="search">
-                <input type="search" id="search-input" list="suggestions" placeholder="Search Node"></input>
-                <datalist id="suggestions">
-                    <option value="cop30"></option>
-                    <option value="brasil"></option>
-                </datalist>
-            </div>
-            </div>
-            <div id="container"></div>
-        </div></>
+        <><div className='container'>
+                <div className='container-row'>
+                    <div id="container" className='container'></div>
+                    <div className='lateral-panel'>
+                        <div id="loader">Loading ...</div>
+                        <div className='container-item'>
+                            <button id="subGraphButton">Show SubGraph</button>
+                        </div>
+                        <div className='container-item'>
+                            <div id="search">
+                                <input type="search" id="search-input" list="suggestions" placeholder="Search Node"></input>
+                                <datalist id="suggestions">
+                                    <option value="cop30"></option>
+                                    <option value="brasil"></option>
+                                </datalist>
+                            </div>
+                        </div>
+                        <div className='container-item'>
+                            <div id="clusterInput" className='clusterInput'></div>
+                        </div>
+                    </div>
+                </div>
+            </div></>
 )};
 
 export default GraphRenderer;
