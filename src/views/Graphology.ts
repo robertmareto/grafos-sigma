@@ -5,7 +5,7 @@ import circular from "graphology-layout/circular";
 import louvain from "graphology-communities-louvain";
 import circlepack from "graphology-layout/circlepack";
 import noverlap from 'graphology-layout-noverlap';
-import { JSONData, Node, CommunityDetails, modularityDetails } from '../Types'
+import { Node, CommunityDetails, modularityDetails } from '../Types'
 // import { UndirectedGraph } from 'graphology';
 // import JSONdata from '../dataGraph.json';
 

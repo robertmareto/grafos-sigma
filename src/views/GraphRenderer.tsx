@@ -1,7 +1,6 @@
 import React, { useState, useEffect, useRef, useCallback } from 'react';
-import { JSONData, State, CommunityDetails, modularityDetails } from '../Types'
+import { JSONData, State, CommunityDetails } from '../Types'
 import Sigma from "sigma";
-import { createGephiGraph, createNewGraph } from './Graphology';
 import { renderSigma } from './Sigma';
 import { handleClusterChange, getSelectedClusters, toggleShowAllNodes, setSearchQuery, setHoveredNode, setEdgeReducer, setNodeReducer } from './SigmaUtils';
 import { graphFunction, graphType } from './JsonValidator'
@@ -24,6 +23,7 @@ import { graphFunction, graphType } from './JsonValidator'
 interface Props {
     jsonData: JSONData;
 }
+
 
 const GraphRenderer = (props: Props) => {
     const sigmaRef = useRef<Sigma | null>(null);
@@ -138,7 +138,6 @@ const GraphRenderer = (props: Props) => {
 
         // State for drag'n'drop
         let draggedNode: string | null = null;
-        let isDragging = false;
 
         // Ações ao passar o mouse sobre o Nó
         renderer.on("enterNode", (e) => {
@@ -174,6 +173,7 @@ const GraphRenderer = (props: Props) => {
         // Atualiza o gráfico Sigma para refletir as alterações
         updatesigma()
     
+// eslint-disable-next-line react-hooks/exhaustive-deps
 }, [communityDetails, props.jsonData]);
 
 
