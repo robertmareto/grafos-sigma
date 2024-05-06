@@ -11,7 +11,7 @@ import { Node, CommunityDetails, modularityDetails } from '../Types'
 
 export function createGephiGraph(data: any): [Graph, CommunityDetails, modularityDetails] {
     const graph = new Graph({
-        multi: true,
+        multi: false,
         allowSelfLoops: true,
         type: 'directed'
     });
@@ -126,7 +126,7 @@ export function createGephiGraph(data: any): [Graph, CommunityDetails, modularit
 
 export function createNewGraph(data: any): [Graph, CommunityDetails, modularityDetails] {
     const graph = new Graph({
-        multi: true,
+        multi: false,
         allowSelfLoops: true,
         type: 'directed'
     });
@@ -213,7 +213,7 @@ export function createNewGraph(data: any): [Graph, CommunityDetails, modularityD
 
 export function createSubGraph(data: any): [Graph, CommunityDetails, modularityDetails] {
     const graph = new Graph({
-        multi: true,
+        multi: false,
         allowSelfLoops: true,
         type: 'directed'
     });
@@ -227,7 +227,7 @@ export function createSubGraph(data: any): [Graph, CommunityDetails, modularityD
     const minDegree = Math.min(...degrees);
     const maxDegree = Math.max(...degrees);
     const minSize = 10;
-    const maxSize = 100;
+    const maxSize = 70;
     
     graph.forEachNode((node) => {
         const degree = graph.degree(node);

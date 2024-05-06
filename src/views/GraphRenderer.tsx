@@ -1,3 +1,4 @@
+/* eslint-disable @typescript-eslint/no-unused-vars */
 import React, { useState, useEffect, useRef, useCallback } from 'react';
 import { JSONData, State, CommunityDetails } from '../Types'
 import Sigma from "sigma";
@@ -7,6 +8,7 @@ import { graphFunction, graphType } from './JsonValidator'
 import {subgraph} from 'graphology-operators';
 import sigma from 'sigma';
 import { createSubGraph } from './Graphology';
+import { setupClusterCheckboxes } from './ClusterBoxes';
 
 // import { BiBookContent, BiRadioCircleMarked } from "react-icons/bi";
 // import { SigmaContainer, ControlsContainer, ZoomControl, FullScreenControl, SearchControl,  } from "@react-sigma/core";
@@ -98,46 +100,9 @@ const GraphRenderer = (props: Props) => {
         // Seletor de Cluster-Comunidades
         const clusterInputParent = document.getElementById("clusterInput");
 
-        // Verificar se o seletor já existe antes de criar novamente
-        if (clusterInputParent && !clusterInputParent.querySelector("#clusterCheckboxes")) {
-            // Cria um grupo de checkboxes
-            const clusterCheckboxesGroup = document.createElement("div");
-            clusterCheckboxesGroup.id = "clusterCheckboxes";
-            
-            // Adiciona a opção "Exibir Todos" como checkbox
-            const showAllCheckbox = document.createElement("input");
-            showAllCheckbox.type = "checkbox";
-            showAllCheckbox.name = "clusterOption";
-            showAllCheckbox.value = "";
-            showAllCheckbox.id = "showAllCheckbox";
-            showAllCheckbox.addEventListener("change", () => toggleShowAllNodes(
-                showAllCheckbox.checked,
-                setClusters,
-                getSelectedClusters,
-            )); // Define a função de clique para exibir todos
-            const showAllLabel = document.createElement("label");
-            showAllLabel.htmlFor = "showAllCheckbox";
-            showAllLabel.textContent = "Exibir Todos";
-            clusterCheckboxesGroup.appendChild(showAllCheckbox);
-            clusterCheckboxesGroup.appendChild(showAllLabel);
-
-            // Adiciona as checkboxes para cada cluster
-            for (let i = 0; i < clustercounter; i++) {
-                const clusterCheckbox = document.createElement("input");
-                clusterCheckbox.type = "checkbox";
-                clusterCheckbox.name = "clusterOption";
-                clusterCheckbox.value = i.toString();
-                clusterCheckbox.id = `clusterCheckbox${i}`;
-                clusterCheckbox.addEventListener("change", handleClusterChange(setClusters, getSelectedClusters)); // Define a função de clique para selecionar o cluster
-                const clusterLabel = document.createElement("label");
-                clusterLabel.htmlFor = `clusterCheckbox${i}`;
-                clusterLabel.textContent = `Cluster ${i + 1}`;
-                clusterCheckboxesGroup.appendChild(clusterCheckbox);
-                clusterCheckboxesGroup.appendChild(clusterLabel);
-            }
-            
-            clusterInputParent.appendChild(clusterCheckboxesGroup);
-            updatesigma()
+        if (clusterInputParent) {
+            setupClusterCheckboxes(clusterInputParent, clustercounter, setClusters, getSelectedClusters, toggleShowAllNodes, handleClusterChange);
+            updatesigma();
         }
 
         // State for drag'n'drop
@@ -185,9 +150,12 @@ const GraphRenderer = (props: Props) => {
         // Atualiza o gráfico Sigma para refletir as alterações
         updatesigma()
 
+        let selectedCluster = 0;
+
+        
         // Retona os nós com a comunidade definida
         const sub = subgraph(graph, function (key, attr) {
-            return attr.community === 6;
+            return attr.community === selectedCluster;
         });
 
         // Verifica o estado do botão de SubGrapho 
@@ -196,14 +164,23 @@ const GraphRenderer = (props: Props) => {
             subGraphButton.addEventListener("click", () => {
                 console.log(sub);
                 sigmaRef.current?.kill(); // Limpa o gráfico principal
-                const [subgraph, subcommunity, submodularuty] = createSubGraph(sub); // Cria um subgrapho
-                sigmaSub.current = renderSigma(subgraph, container); // Renderiza o subgrapho
-                sigmaSub.current?.refresh({ // Atualiza o subgrapho
-                    skipIndexation: false,
-                    });
-
+                const [subgraph, subcommunity, submodularity] = createSubGraph(sub); // Cria um subgrafo
+                sigmaSub.current = renderSigma(subgraph, container); // Renderiza o subgrafo
+        
+                // Remove os checkboxes do gráfico principal
+                const clusterInputParent = document.getElementById("clusterInput");
+                if (clusterInputParent) {
+                    clusterInputParent.innerHTML = ''; // Remove todos os elementos filhos
+                }
+        
+                // Cria novos checkboxes para o subgrafo
+                if (clusterInputParent) {
+                    setupClusterCheckboxes(clusterInputParent, clustercounter, setClusters, getSelectedClusters, toggleShowAllNodes, handleClusterChange);
+                    sigmaSub.current?.refresh({ skipIndexation: false });
+                }
             });
         }
+        
     
 // eslint-disable-next-line react-hooks/exhaustive-deps
 }, [communityDetails, props.jsonData]);
