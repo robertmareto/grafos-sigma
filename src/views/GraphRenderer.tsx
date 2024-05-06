@@ -4,6 +4,9 @@ import Sigma from "sigma";
 import { renderSigma } from './Sigma';
 import { handleClusterChange, getSelectedClusters, toggleShowAllNodes, setSearchQuery, setHoveredNode, setEdgeReducer, setNodeReducer } from './SigmaUtils';
 import { graphFunction, graphType } from './JsonValidator'
+import {subgraph} from 'graphology-operators';
+import sigma from 'sigma';
+import { createSubGraph } from './Graphology';
 
 // import { BiBookContent, BiRadioCircleMarked } from "react-icons/bi";
 // import { SigmaContainer, ControlsContainer, ZoomControl, FullScreenControl, SearchControl,  } from "@react-sigma/core";
@@ -26,6 +29,7 @@ interface Props {
 
 
 const GraphRenderer = (props: Props) => {
+    const sigmaSub = useRef<Sigma | null>(null);
     const sigmaRef = useRef<Sigma | null>(null);
     const [communityDetails] = useState<CommunityDetails | null>(null);
 
@@ -60,13 +64,13 @@ const GraphRenderer = (props: Props) => {
         const searchQueryHandler = setSearchQuery(state, graph, sigmaRef);
         const hoveredNodeHandler = setHoveredNode(state, graph, sigmaRef);
 
-        let hierarquia = "comunnity"
+        let hierarquia = 'community'
 
         if (graphType === 'Gephi') {
-            hierarquia = "modularity_class";
+            hierarquia = 'modularity_class';
         }
         
-        console.log(hierarquia)
+        //console.log(hierarquia)
 
         let clustercounter = graphFunction(props.jsonData) ? details.count : modularityDetails.count;
 
@@ -138,12 +142,20 @@ const GraphRenderer = (props: Props) => {
 
         // State for drag'n'drop
         let draggedNode: string | null = null;
+   
+
+        // Obtem Informações do Nó - debbug function
+        function NodeInfo (graph: any, node: any) {
+            const nodeInfo = graph.getNodeAttributes(node)
+            return nodeInfo
+        }
 
         // Ações ao passar o mouse sobre o Nó
         renderer.on("enterNode", (e) => {
             draggedNode = e.node; // Define o nó especifico
             hoveredNodeHandler(draggedNode) // oculta os nós sem relação
             graph.setNodeAttribute(draggedNode, "highlighted", true); // dá destauqe ao nó
+            console.log(NodeInfo(graph, draggedNode)); // exibe informações do nó
         });
 
         // Ações ao sair o mouse do Nó
@@ -172,6 +184,26 @@ const GraphRenderer = (props: Props) => {
 
         // Atualiza o gráfico Sigma para refletir as alterações
         updatesigma()
+
+        // Retona os nós com a comunidade definida
+        const sub = subgraph(graph, function (key, attr) {
+            return attr.community === 6;
+        });
+
+        // Verifica o estado do botão de SubGrapho 
+        const subGraphButton = document.getElementById("subGraphButton") as HTMLButtonElement;
+        if (subGraphButton) {
+            subGraphButton.addEventListener("click", () => {
+                console.log(sub);
+                sigmaRef.current?.kill(); // Limpa o gráfico principal
+                const [subgraph, subcommunity, submodularuty] = createSubGraph(sub); // Cria um subgrapho
+                sigmaSub.current = renderSigma(subgraph, container); // Renderiza o subgrapho
+                sigmaSub.current?.refresh({ // Atualiza o subgrapho
+                    skipIndexation: false,
+                    });
+
+            });
+        }
     
 // eslint-disable-next-line react-hooks/exhaustive-deps
 }, [communityDetails, props.jsonData]);
@@ -192,6 +224,7 @@ const GraphRenderer = (props: Props) => {
     return (
         <><div>
             <div id="loader">Loading ...</div>
+            <button id="subGraphButton">Show SubGraph</button>
             <div id="clusterInput" className='clusterInput'>
             <div id="search">
                 <input type="search" id="search-input" list="suggestions" placeholder="Search Node"></input>
@@ -199,7 +232,8 @@ const GraphRenderer = (props: Props) => {
                     <option value="cop30"></option>
                     <option value="brasil"></option>
                 </datalist>
-            </div></div>
+            </div>
+            </div>
             <div id="container"></div>
         </div></>
 )};
