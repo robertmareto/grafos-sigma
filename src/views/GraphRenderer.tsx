@@ -176,10 +176,11 @@ const GraphRenderer = (props: Props) => {
                 // Cria novos checkboxes para o subgrafo
                 if (clusterInputParent) {
                     setupClusterCheckboxes(clusterInputParent, clustercounter, setClusters, getSelectedClusters, toggleShowAllNodes, handleClusterChange);
-                    sigmaSub.current?.refresh({ skipIndexation: false });
+                    sigmaSub.current?.refresh({ skipIndexation: false }); // Atualiza o subgrafo
                 }
             });
         }
+        
         
     
 // eslint-disable-next-line react-hooks/exhaustive-deps
