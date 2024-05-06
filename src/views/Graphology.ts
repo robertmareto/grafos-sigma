@@ -207,6 +207,8 @@ export function createNewGraph(data: any): [Graph, CommunityDetails, modularityD
     console.log('Numero de Clusters', counter )
     console.log('Numero de nós', nodecounter )
     console.log('============================================================')
+    // console.log(graph)
+    // localStorage.setItem('GraphData', JSON.stringify(graph));
 
     return [graph, communityDetails, modularityDetails];
 }
@@ -286,7 +288,7 @@ export function createSubGraph(data: any): [Graph, CommunityDetails, modularityD
     // Trabalha o espaçamento entre os nós
     noverlap.assign(graph, {
         settings: {
-            margin: 1,
+            margin: 2,
         }
     });
 

@@ -1,5 +1,5 @@
 import { createGephiGraph, createNewGraph } from './Graphology'; // Importe as funções necessárias
-import JSONdata from '../data/AtoresGraph.json'
+import JSONdata from '../data/data.json'
 
 function isJSONStructureValid(data: any): boolean {
     // Verifica se o JSON tem a estrutura esperada

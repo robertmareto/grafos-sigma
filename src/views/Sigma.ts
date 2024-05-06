@@ -6,15 +6,18 @@ import Graph from "graphology";
 
 export function renderSigma(graph: Graph, container: HTMLElement) {
     return new Sigma(graph, container, {
-        defaultNodeType: "bordered",
-        labelSize: 12,
-        labelDensity: 10,
-        labelGridCellSize: 5,
-        labelRenderedSizeThreshold: 12,
+        //defaultNodeType: "bordered",
+        labelSize: 12, // Tamanho da label
+        labelDensity: 10, // Densidade da label
+        labelGridCellSize: 5, // Tamanho da célula da grade
+        labelRenderedSizeThreshold: 12, // Tamanho mínimo da label
         labelFont: "Lato, sans-serif", // Fonte da Label
         zIndex: true,
-        defaultEdgeType: "curve",
+        defaultEdgeType: "curve", // Tipo de aresta
         itemSizesReference: "positions",
+        minCameraRatio: 0.15,  // Zoom mínimo
+        maxCameraRatio: 1.2,  // Zoom máximo
+        stagePadding: 10, // Espaçamento do palco
         edgeProgramClasses: {
             curve: EdgeCurveProgram,
         },

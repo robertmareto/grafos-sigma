@@ -26,13 +26,13 @@ export function getSelectedClusters() {
 export function toggleShowAllNodes(
     showAll: boolean,
     setClusters: (clusters: string[]) => void,
-    getSelectedClusters: () => string[]
+    //getSelectedClusters: () => string[]
 ) {
     if (showAll) {
         setClusters([]);
-    } else {
-        setClusters(getSelectedClusters());
-    }
+    } //else {
+    //     setClusters(getSelectedClusters());
+    // }
 }
 
 
