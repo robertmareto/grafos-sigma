@@ -8,6 +8,7 @@ import noverlap from 'graphology-layout-noverlap';
 import { Node, CommunityDetails, modularityDetails } from '../Types'
 import {subgraph} from 'graphology-operators';
 import { AnyARecord } from "dns";
+import { get } from "http";
 // import { UndirectedGraph } from 'graphology';
 // import JSONdata from '../dataGraph.json';
 
@@ -322,7 +323,7 @@ export function createSubGraphs(graph: Graph) {
 
         // Add nodes to the subgraph
         communityNodes.forEach(node => {
-            subgraph.addNode(node);
+            subgraph.addNode(node, graph.getNodeAttributes(node));
         });
 
         // Add edges to the subgraph based on the original graph

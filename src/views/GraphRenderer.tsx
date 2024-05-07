@@ -151,7 +151,7 @@ const GraphRenderer = (props: Props) => {
 
     // Obtem os subgraphos do grafo principal
     const subgraphs = createSubGraphs(graph);
-    //console.log(subgraphs)
+    console.log(subgraphs)
 
     let selectedCluster = 0; // Inicializa o cluster selecionado como 0
     let sub: AbstractGraph<Attributes, Attributes, Attributes> | null = null; // Inicializa sub como nulo
@@ -164,14 +164,9 @@ const GraphRenderer = (props: Props) => {
         checkbox.addEventListener('change', function(this: HTMLInputElement) { 
             if (this.checked) {
                 selectedCluster = parseInt(this.value);
-                updateSubGraph();
             }
         });
     });
-    
-    function updateSubGraph() {
-        sub = setSubGraphInterval(); // Atualiza sub com o novo subgrafo
-    }
     
     let SubGraphAttr = "community"; // Inicializa com 'community'
     
@@ -179,12 +174,27 @@ const GraphRenderer = (props: Props) => {
         SubGraphAttr = "modularity_class"; // Muda para 'modularity_class' se graphType for 'Gephi'
     }
     
-    function setSubGraphInterval() {
-        return subgraph(graph, function (key, attr) {
-            return attr[SubGraphAttr] === selectedCluster;
+    // Verifica o estado do botão de SubGrapho 
+    const subGraphButton = document.getElementById("subGraphButton") as HTMLButtonElement;
+    if (subGraphButton) {
+        subGraphButton.addEventListener("click", () => {
+            sigmaRef.current?.kill();
+            const selectedClusters = Array.from(checkboxes)
+                .filter(checkbox => (checkbox as HTMLInputElement).checked)
+                .map(checkbox => parseInt((checkbox as HTMLInputElement).value));
+
+            console.log(selectedClusters)
+            
+        // usa sigma para renderizar os subgrafos selecionados
+        selectedClusters.forEach(cluster => {
+            const subGraph = subgraphs[cluster];
+            const [subdata, subcommunities, submodulaties] = processSubGraph(subGraph);
+            sigmaSub.current = renderSigma(subdata, container);
+            sigmaSub.current?.refresh({ skipIndexation: false });
         });
-    }
-    
+    });
+}
+
     const mainGraphButton = document.getElementById("mainGraphButton") as HTMLButtonElement;
     if (mainGraphButton) {
         mainGraphButton.addEventListener("click", () => {
@@ -205,9 +215,6 @@ const GraphRenderer = (props: Props) => {
                 toggleShowAllNodes(true, setClusters);
         });
     }
-    
-    // Verifica o estado do botão de SubGrapho 
-    const subGraphButton = document.getElementById("subGraphButton") as HTMLButtonElement;
 
     /*
     if (subGraphButton) {
