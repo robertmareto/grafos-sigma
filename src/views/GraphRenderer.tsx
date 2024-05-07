@@ -6,7 +6,7 @@ import { renderSigma } from './Sigma';
 import { handleClusterChange, getSelectedClusters, toggleShowAllNodes, setSearchQuery, setHoveredNode, setEdgeReducer, setNodeReducer } from './SigmaUtils';
 import { graphFunction, graphType } from './JsonValidator'
 import {subgraph} from 'graphology-operators';
-import { createSubGraph } from './Graphology';
+import { processSubGraph, createSubGraphs } from './Graphology';
 import { setupClusterCheckboxes } from './ClusterBoxes';
 import AbstractGraph, { Attributes } from 'graphology-types';
 import Graph from 'graphology';
@@ -41,7 +41,6 @@ const GraphRenderer = (props: Props) => {
     const renderGraph = useCallback(() => {
 
     const [graph, details, modularityDetails] = graphFunction(props.jsonData);
-    console.log(graphFunction(props.jsonData))
     
     // Localiza o container
     const container = document.getElementById("container") as HTMLElement;
@@ -120,7 +119,7 @@ const GraphRenderer = (props: Props) => {
         draggedNode = e.node; // Define o nó especifico
         hoveredNodeHandler(draggedNode) // oculta os nós sem relação
         graph.setNodeAttribute(draggedNode, "highlighted", true); // dá destauqe ao nó
-        console.log(NodeInfo(graph, draggedNode)); // exibe informações do nó
+        //console.log(NodeInfo(graph, draggedNode)); // exibe informações do nó
     });
 
     // Ações ao sair o mouse do Nó
@@ -149,6 +148,10 @@ const GraphRenderer = (props: Props) => {
 
     // Atualiza o gráfico Sigma para refletir as alterações
     updatesigma()
+
+    // Obtem os subgraphos do grafo principal
+    const subgraphs = createSubGraphs(graph);
+    //console.log(subgraphs)
 
     let selectedCluster = 0; // Inicializa o cluster selecionado como 0
     let sub: AbstractGraph<Attributes, Attributes, Attributes> | null = null; // Inicializa sub como nulo
@@ -205,18 +208,20 @@ const GraphRenderer = (props: Props) => {
     
     // Verifica o estado do botão de SubGrapho 
     const subGraphButton = document.getElementById("subGraphButton") as HTMLButtonElement;
+
+    /*
     if (subGraphButton) {
         subGraphButton.addEventListener("click", () => {
             if (sub) { // Verifica se sub não é nulo antes de prosseguir
                 sigmaRef.current?.kill(); // Limpa o gráfico principal
-                const [subgraph, subcommunity, submodularity] = createSubGraph(sub); // Cria um subgrafo
+                const [subgraph, subcommunity, submodularity] = processSubGraph(sub); // Cria um subgrafo
                 sigmaSub.current = renderSigma(subgraph, container); // Renderiza o subgrafo
     
                 // Remove os checkboxes do gráfico principal
                 const clusterInputParent = document.getElementById("clusterInput");
                 if (clusterInputParent) {
                     clusterInputParent.innerHTML = ''; // Remove todos os elementos filhos
-                    console.log("input cluster removido")
+                    //console.log("input cluster removido")
                 }
     
                 const clustercounter = subcommunity.count; // Conta o número de clusters no subgrafo
@@ -236,7 +241,7 @@ const GraphRenderer = (props: Props) => {
                 console.error("Subgrafo não foi inicializado.");
             }
         });
-    }
+    } */
         
         
 // eslint-disable-next-line react-hooks/exhaustive-deps

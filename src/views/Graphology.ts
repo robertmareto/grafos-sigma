@@ -7,6 +7,7 @@ import circlepack from "graphology-layout/circlepack";
 import noverlap from 'graphology-layout-noverlap';
 import { Node, CommunityDetails, modularityDetails } from '../Types'
 import {subgraph} from 'graphology-operators';
+import { AnyARecord } from "dns";
 // import { UndirectedGraph } from 'graphology';
 // import JSONdata from '../dataGraph.json';
 
@@ -212,14 +213,12 @@ export function createNewGraph(data: any): [Graph, CommunityDetails, modularityD
     console.log('Numero de Clusters', counter )
     console.log('Numero de nós', nodecounter )
     console.log('============================================================')
-    console.log(graph)
-    localStorage.setItem('GraphData', JSON.stringify(graph));
 
     return [graph, communityDetails, modularityDetails];
 }
 
 // Cria um subgrafo com base em um grafo e um filtro
-export function createSubGraph(data: any): [Graph, CommunityDetails, modularityDetails] {
+export function processSubGraph(data: any): [Graph, CommunityDetails, modularityDetails] {
     const graph = new Graph({
         multi: false,
         allowSelfLoops: true,
@@ -306,50 +305,46 @@ export function createSubGraph(data: any): [Graph, CommunityDetails, modularityD
     return [graph, communityDetails, modularityDetails];
 }
 
-/*
-export function createSubgraphs(graph: Graph): [Graph, CommunityDetails, modularityDetails] {
-    const CommunityDetails = louvain.detailed(graph);
 
-    CommunityDetails.count = CommunityCount
-    for (let element in CommunityDetails.count {
-        subgraph = subgraph(graph, function (key, attr) {
-            return attr.community === element;
+export function createSubGraphs(graph: Graph) {
+    // Perform Louvain community detection
+    const communityDetails = louvain.detailed(graph);
+    const numberOfCommunities = communityDetails.count;
+
+    const subgraphs = [];
+
+    // For each community, create a subgraph
+    for (let communityId = 0; communityId < numberOfCommunities; communityId++) {
+        const communityNodes = Object.keys(communityDetails.communities).filter(node => communityDetails.communities[node] === communityId);
+
+        // Create a subgraph for the current community
+        const subgraph = new Graph();
+
+        // Add nodes to the subgraph
+        communityNodes.forEach(node => {
+            subgraph.addNode(node);
         });
 
-    const subgraphs = graph;
+        // Add edges to the subgraph based on the original graph
+        communityNodes.forEach(node => {
+            const neighbors = graph.neighbors(node);
+            neighbors.forEach(neighbor => {
+                // Check if the neighbor is also in the current community
+                if (communityDetails.communities[neighbor] === communityId) {
+                    // Add edge to the subgraph
+                    subgraph.addEdge(node, neighbor);
+                }
+            });
+        });
 
-    const subgraphDetails = { count: 0, classes: {"0": 0} }
+        // Optionally, perform operations on the subgraph here
 
-    let counter = subgraphs.count
+        // Add the subgraph to the list of subgraphs
+        subgraphs.push(subgraph);
+    }
 
-    let nodecounter = 0
-
-    graph.forEachNode((node) => {
-        nodecounter++
-    });
-
-
-    // Aplica o layout CirclePack
-    circlepack.assign(graph, {
-        center: 2,
-        hierarchyAttributes: ['community'], // Atributo usado para definir os clusters
-        scale: 1.2 //Escala de tamanho entre os nós
-    });
-
-    // Trabalha o espaçamento entre os nós
-    noverlap.assign(graph, {
-        settings: {
-            margin: 2,
-        }
-    });
-
-    console.log('Grapho gerado usando Modularidade do tipo:', 'community' )
-    console.log('Numero de Clusters', counter )
-    console.log('Numero de nós', nodecounter )
-    console.log('============================================================')
-
-    return [graphq, subgraphDetails, modularityDetails];
-} */
+    return subgraphs;
+}
 
 // Conta o numero de Modularidades unicas e retorna uma relação de nós por classe de modularidade
 export function countUniqueModularityClasses(nodes: Node[]): { count: number, classes: Record<string, number> } {
