@@ -223,7 +223,7 @@ const GraphRenderer = (props: Props) => {
     
                 // Cria novos checkboxes para o subgrafo
                 if (clusterInputParent) {
-                    //setupClusterCheckboxes(clusterInputParent, clustercounter, setClusters, getSelectedClusters, toggleShowAllNodes, handleClusterChange);
+                    setupClusterCheckboxes(clusterInputParent, clustercounter, setClusters, getSelectedClusters, toggleShowAllNodes, handleClusterChange);
                     sigmaSub.current?.refresh({ skipIndexation: false }); // Atualiza o subgrafo
                 }
     

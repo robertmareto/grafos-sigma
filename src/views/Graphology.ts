@@ -6,9 +6,11 @@ import louvain from "graphology-communities-louvain";
 import circlepack from "graphology-layout/circlepack";
 import noverlap from 'graphology-layout-noverlap';
 import { Node, CommunityDetails, modularityDetails } from '../Types'
+import {subgraph} from 'graphology-operators';
 // import { UndirectedGraph } from 'graphology';
 // import JSONdata from '../dataGraph.json';
 
+// Cria um grafo a partir de um objeto JSON do Gephi
 export function createGephiGraph(data: any): [Graph, CommunityDetails, modularityDetails] {
     const graph = new Graph({
         multi: false,
@@ -124,6 +126,7 @@ export function createGephiGraph(data: any): [Graph, CommunityDetails, modularit
     return [graph, communityDetails, modularityDetails];
 }
 
+// Cria um grafo a partir de um objeto JSON
 export function createNewGraph(data: any): [Graph, CommunityDetails, modularityDetails] {
     const graph = new Graph({
         multi: false,
@@ -168,6 +171,8 @@ export function createNewGraph(data: any): [Graph, CommunityDetails, modularityD
 
     const communityDetails = louvain.detailed(graph);
 
+    console.log(communityDetails)
+
     let counter = communityDetails.count
 
     let nodecounter = 0
@@ -207,12 +212,13 @@ export function createNewGraph(data: any): [Graph, CommunityDetails, modularityD
     console.log('Numero de Clusters', counter )
     console.log('Numero de nós', nodecounter )
     console.log('============================================================')
-    // console.log(graph)
-    // localStorage.setItem('GraphData', JSON.stringify(graph));
+    console.log(graph)
+    localStorage.setItem('GraphData', JSON.stringify(graph));
 
     return [graph, communityDetails, modularityDetails];
 }
 
+// Cria um subgrafo com base em um grafo e um filtro
 export function createSubGraph(data: any): [Graph, CommunityDetails, modularityDetails] {
     const graph = new Graph({
         multi: false,
@@ -299,6 +305,51 @@ export function createSubGraph(data: any): [Graph, CommunityDetails, modularityD
 
     return [graph, communityDetails, modularityDetails];
 }
+
+/*
+export function createSubgraphs(graph: Graph): [Graph, CommunityDetails, modularityDetails] {
+    const CommunityDetails = louvain.detailed(graph);
+
+    CommunityDetails.count = CommunityCount
+    for (let element in CommunityDetails.count {
+        subgraph = subgraph(graph, function (key, attr) {
+            return attr.community === element;
+        });
+
+    const subgraphs = graph;
+
+    const subgraphDetails = { count: 0, classes: {"0": 0} }
+
+    let counter = subgraphs.count
+
+    let nodecounter = 0
+
+    graph.forEachNode((node) => {
+        nodecounter++
+    });
+
+
+    // Aplica o layout CirclePack
+    circlepack.assign(graph, {
+        center: 2,
+        hierarchyAttributes: ['community'], // Atributo usado para definir os clusters
+        scale: 1.2 //Escala de tamanho entre os nós
+    });
+
+    // Trabalha o espaçamento entre os nós
+    noverlap.assign(graph, {
+        settings: {
+            margin: 2,
+        }
+    });
+
+    console.log('Grapho gerado usando Modularidade do tipo:', 'community' )
+    console.log('Numero de Clusters', counter )
+    console.log('Numero de nós', nodecounter )
+    console.log('============================================================')
+
+    return [graphq, subgraphDetails, modularityDetails];
+} */
 
 // Conta o numero de Modularidades unicas e retorna uma relação de nós por classe de modularidade
 export function countUniqueModularityClasses(nodes: Node[]): { count: number, classes: Record<string, number> } {
