@@ -6,9 +6,8 @@ import louvain from "graphology-communities-louvain";
 import circlepack from "graphology-layout/circlepack";
 import noverlap from 'graphology-layout-noverlap';
 import { Node, CommunityDetails, modularityDetails } from '../Types'
-import {subgraph} from 'graphology-operators';
-import { AnyARecord } from "dns";
-import { get } from "http";
+
+//import {subgraph} from 'graphology-operators';
 // import { UndirectedGraph } from 'graphology';
 // import JSONdata from '../dataGraph.json';
 
