@@ -10,6 +10,8 @@ import { processSubGraph, createSubGraphs } from './Graphology';
 import { setupClusterCheckboxes } from './ClusterBoxes';
 import AbstractGraph, { Attributes } from 'graphology-types';
 import Graph from 'graphology';
+import ForceSupervisor from "graphology-layout-force/worker";
+import forceLayout from 'graphology-layout-force';
 
 // import { BiBookContent, BiRadioCircleMarked } from "react-icons/bi";
 // import { SigmaContainer, ControlsContainer, ZoomControl, FullScreenControl, SearchControl,  } from "@react-sigma/core";
@@ -61,6 +63,18 @@ const GraphRenderer = (props: Props) => {
         skipIndexation: false,
         });
     }
+
+    const layout = new ForceSupervisor(graph, {
+        settings: {
+            //gravity: 30,
+            inertia: 0.1,
+            //repulsion: 0.1,
+            //attraction: 0.1,
+            maxMove: 0.01,
+        },
+    });
+
+    //layout.start();
 
     const searchQueryHandler = setSearchQuery(state, graph, sigmaRef);
     const hoveredNodeHandler = setHoveredNode(state, graph, sigmaRef);
@@ -151,12 +165,9 @@ const GraphRenderer = (props: Props) => {
 
     // Obtem os subgraphos do grafo principal
     const subgraphs = createSubGraphs(graph);
-    console.log(subgraphs)
+    //console.log(subgraphs)
 
     let selectedCluster = 0; // Inicializa o cluster selecionado como 0
-    let sub: AbstractGraph<Attributes, Attributes, Attributes> | null = null; // Inicializa sub como nulo
-    let subDepth = 0; // Inicializa a profundidade do subgrafo como 0
-    const maxDepth = 3; // Define a profundidade máxima do subgrafo como 2
     
     // Adiciona um evento de mudança para os checkboxes
     const checkboxes = document.querySelectorAll('input[name="clusterOption"]');
@@ -168,29 +179,27 @@ const GraphRenderer = (props: Props) => {
         });
     });
     
-    let SubGraphAttr = "community"; // Inicializa com 'community'
+    // let SubGraphAttr = "community"; // Inicializa com 'community'
     
-    if (graphType === 'Gephi') {
-        SubGraphAttr = "modularity_class"; // Muda para 'modularity_class' se graphType for 'Gephi'
-    }
+    // if (graphType === 'Gephi') {
+    //     SubGraphAttr = "modularity_class"; // Muda para 'modularity_class' se graphType for 'Gephi'
+    // }
     
     // Verifica o estado do botão de SubGrapho 
     const subGraphButton = document.getElementById("subGraphButton") as HTMLButtonElement;
     if (subGraphButton) {
         subGraphButton.addEventListener("click", () => {
-            sigmaRef.current?.kill();
-            const selectedClusters = Array.from(checkboxes)
-                .filter(checkbox => (checkbox as HTMLInputElement).checked)
-                .map(checkbox => parseInt((checkbox as HTMLInputElement).value));
-
-            console.log(selectedClusters)
+            sigmaRef.current?.kill(); // Limpa o gráfico principal
+            const selectedClusters = Array.from(checkboxes) // Obtem os clusters selecionados
+                .filter(checkbox => (checkbox as HTMLInputElement).checked) // Filtra os checkboxes selecionados
+                .map(checkbox => parseInt((checkbox as HTMLInputElement).value)); // Mapeia os valores dos checkboxes selecionados
             
         // usa sigma para renderizar os subgrafos selecionados
         selectedClusters.forEach(cluster => {
-            const subGraph = subgraphs[cluster];
+            const subGraph = subgraphs[cluster]; // Obtem o subgrafo do cluster selecionado
             const [subdata, subcommunities, submodulaties] = processSubGraph(subGraph);
-            sigmaSub.current = renderSigma(subdata, container);
-            sigmaSub.current?.refresh({ skipIndexation: false });
+            sigmaSub.current = renderSigma(subdata, container); // Renderiza o subgrafo
+            sigmaSub.current?.refresh({ skipIndexation: false }); // Atualiza o subgrafo
         });
     });
 }
@@ -204,8 +213,6 @@ const GraphRenderer = (props: Props) => {
                 sigmaSub.current = null;
                 sigmaSub2.current?.kill();
                 sigmaSub2.current = null;
-                sub = null;
-                subDepth = 0;
                 clustercounter = graphFunction(props.jsonData) ? details.count : modularityDetails.count;
                 if (clusterInputParent) {
                     setupClusterCheckboxes(clusterInputParent, clustercounter, setClusters, getSelectedClusters, toggleShowAllNodes, handleClusterChange);

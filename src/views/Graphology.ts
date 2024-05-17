@@ -6,7 +6,6 @@ import louvain from "graphology-communities-louvain";
 import circlepack from "graphology-layout/circlepack";
 import noverlap from 'graphology-layout-noverlap';
 import { Node, CommunityDetails, modularityDetails } from '../Types'
-import ForceSupervisor from "graphology-layout-force/worker";
 
 //import {subgraph} from 'graphology-operators';
 // import { UndirectedGraph } from 'graphology';
