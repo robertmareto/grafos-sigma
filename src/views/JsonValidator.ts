@@ -18,4 +18,4 @@ function isJSONStructureValid(data: any): boolean {
 // Verifique a estrutura do JSONdata e exporte a função apropriada
 export const graphFunction = isJSONStructureValid(JSONdata) ? createGephiGraph : createNewGraph;
 export const graphType = isJSONStructureValid(JSONdata) ? 'Gephi' : 'Sigma';
-export default JSONdata;
+export default JSONdata; 
